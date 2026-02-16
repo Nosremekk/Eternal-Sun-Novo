@@ -1,0 +1,8 @@
+{
+  "FolderOrderSettings":[],
+  "ResourceOrderSettings":[
+    {"name":"rm_level_demo_7","order":1,"path":"rooms/rm_level_demo_7/rm_level_demo_7.yy",},
+    {"name":"rm_level_demo_8","order":2,"path":"rooms/rm_level_demo_8/rm_level_demo_8.yy",},
+    {"name":"rm_level_demo_9","order":3,"path":"rooms/rm_level_demo_9/rm_level_demo_9.yy",},
+  ],
+}

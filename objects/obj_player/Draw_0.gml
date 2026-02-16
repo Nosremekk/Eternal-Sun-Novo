@@ -8,7 +8,7 @@ if (image_alpha < 0.8)
     shader_reset();
 }
 
-draw_text(x,y-64,velv);
+
 
 
 

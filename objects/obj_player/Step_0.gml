@@ -16,9 +16,7 @@ roda_estado(); //Se começar a bugar lembrar de passar isso pra dps da colisao
 
 // Colisão
 plat_fina();
-move_and_collide(velh * global.vel_scale, 0, colisor, 4);
-move_and_collide(0,   velv * global.vel_scale, colisor,12);
-
+colisao();
 verifica_espinho();
 
 //Descontando o inv_timer e aplicando efeito de hit

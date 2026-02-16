@@ -231,6 +231,36 @@ movimento_vertical = function()
     // Consome buffer gradualmente
     if (timer_queda > 0) timer_queda--;
 };
+//Colisao manual
+colisao = function()
+{
+    var _velh_final = velh * global.vel_scale;
+    var _velv_final = velv * global.vel_scale;
+
+
+   if (place_meeting(x + _velh_final, y, colisor)) 
+   {
+       while (!place_meeting(x + sign(_velh_final), y, colisor)) 
+       {
+           x += sign(_velh_final);
+       }
+       _velh_final = 0;
+       velh = 0;
+   }
+   x += _velh_final;
+   
+   
+   if (place_meeting(x, y + _velv_final, colisor)) 
+   {
+       while (!place_meeting(x, y + sign(_velv_final), colisor)) 
+       {
+           y += sign(_velv_final);
+       }
+       _velv_final = 0;
+       velv = 0;
+   }
+   y += _velv_final;
+}
 
 //Plataforma fina
 plat_fina = function()
