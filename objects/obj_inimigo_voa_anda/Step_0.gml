@@ -1,0 +1,1 @@
+step_inimigo(altura_max+20);

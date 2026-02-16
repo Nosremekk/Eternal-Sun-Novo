@@ -1,0 +1,1 @@
+if (renderer != undefined) renderer.Update();

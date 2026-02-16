@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sfx_menu_click",
+  "audioGroupId":{
+    "name":"ag_ui",
+    "path":"audiogroups/ag_ui",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":0.6530612,
+  "exportDir":"",
+  "name":"sfx_menu_click",
+  "parent":{
+    "name":"menu",
+    "path":"folders/Sounds/sfx/menu.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sfx_menu_click.mp3",
+  "volume":1.0,
+}

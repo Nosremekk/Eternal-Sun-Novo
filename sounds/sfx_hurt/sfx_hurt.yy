@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"sfx_hurt",
+  "audioGroupId":{
+    "name":"ag_gameplay",
+    "path":"audiogroups/ag_gameplay",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":1.6201587,
+  "exportDir":"",
+  "name":"sfx_hurt",
+  "parent":{
+    "name":"Gameplay",
+    "path":"folders/Sounds/sfx/Gameplay.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"sfx_hurt.mp3",
+  "volume":1.0,
+}

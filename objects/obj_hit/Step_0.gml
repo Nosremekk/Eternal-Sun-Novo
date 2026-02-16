@@ -1,0 +1,2 @@
+aplica_dano(dano);
+

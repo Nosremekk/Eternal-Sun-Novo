@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_test",
+  "audioGroupId":{
+    "name":"ag_gameplay",
+    "path":"audiogroups/ag_gameplay",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":133.17224,
+  "exportDir":"",
+  "name":"snd_test",
+  "parent":{
+    "name":"Falas",
+    "path":"folders/Sounds/Falas.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_test.mp3",
+  "volume":1.0,
+}

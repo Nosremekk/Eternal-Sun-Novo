@@ -1,0 +1,26 @@
+{
+  "$GMSound":"v2",
+  "%Name":"snd_fase1",
+  "audioGroupId":{
+    "name":"ag_gameplay",
+    "path":"audiogroups/ag_gameplay",
+  },
+  "bitDepth":1,
+  "channelFormat":0,
+  "compression":0,
+  "compressionQuality":4,
+  "conversionMode":0,
+  "duration":258.16815,
+  "exportDir":"",
+  "name":"snd_fase1",
+  "parent":{
+    "name":"Musicas",
+    "path":"folders/Sounds/Musicas.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_fase1.mp3",
+  "volume":1.0,
+}
