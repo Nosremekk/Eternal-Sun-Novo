@@ -126,6 +126,7 @@
     {"id":{"name":"fnt_versao","path":"fonts/fnt_versao/fnt_versao.yy",},},
     {"id":{"name":"__InputUpdateController","path":"objects/__InputUpdateController/__InputUpdateController.yy",},},
     {"id":{"name":"obj_aviso_item","path":"objects/obj_aviso_item/obj_aviso_item.yy",},},
+    {"id":{"name":"obj_cam_regiao","path":"objects/obj_cam_regiao/obj_cam_regiao.yy",},},
     {"id":{"name":"obj_cam","path":"objects/obj_cam/obj_cam.yy",},},
     {"id":{"name":"obj_cenario_interativo","path":"objects/obj_cenario_interativo/obj_cenario_interativo.yy",},},
     {"id":{"name":"obj_colisor_fino","path":"objects/obj_colisor_fino/obj_colisor_fino.yy",},},

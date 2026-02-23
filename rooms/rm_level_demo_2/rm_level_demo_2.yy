@@ -37,6 +37,8 @@
     {"name":"inst_5AB49932","path":"rooms/rm_level_demo_2/rm_level_demo_2.yy",},
     {"name":"inst_413741D0","path":"rooms/rm_level_demo_2/rm_level_demo_2.yy",},
     {"name":"inst_7568EC77","path":"rooms/rm_level_demo_2/rm_level_demo_2.yy",},
+    {"name":"inst_214ECFC7","path":"rooms/rm_level_demo_2/rm_level_demo_2.yy",},
+    {"name":"inst_4027B278","path":"rooms/rm_level_demo_2/rm_level_demo_2.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -71,6 +73,8 @@
             {"$GMOverriddenProperty":"v1","%Name":"","name":"","objectId":{"name":"obj_transicao","path":"objects/obj_transicao/obj_transicao.yy",},"propertyId":{"name":"y_destino","path":"objects/obj_transicao/obj_transicao.yy",},"resourceType":"GMOverriddenProperty","resourceVersion":"2.0","value":"-544",},
           ],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":20.0,"scaleY":7.0,"x":5280.0,"y":1312.0,},
         {"$GMRInstance":"v4","%Name":"inst_7568EC77","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_7568EC77","objectId":{"name":"obj_colisor","path":"objects/obj_colisor/obj_colisor.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":20.0,"scaleY":1.0,"x":5280.0,"y":1536.0,},
+        {"$GMRInstance":"v4","%Name":"inst_214ECFC7","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_214ECFC7","objectId":{"name":"obj_cam_regiao","path":"objects/obj_cam_regiao/obj_cam_regiao.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":185.0,"scaleY":58.0,"x":960.0,"y":-288.0,},
+        {"$GMRInstance":"v4","%Name":"inst_4027B278","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_4027B278","objectId":{"name":"obj_cam_regiao","path":"objects/obj_cam_regiao/obj_cam_regiao.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":32.0,"scaleY":45.0,"x":-64.0,"y":-288.0,},
       ],"layers":[],"name":"Colisores","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRInstanceLayer":"","%Name":"Instances","depth":400,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[
         {"$GMRInstance":"v4","%Name":"inst_5E13588","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_5E13588","objectId":{"name":"obj_player","path":"objects/obj_player/obj_player.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":1056.0,"y":-96.0,},
@@ -138,7 +142,7 @@
     "Luz_Caverna",
   ],
   "views":[
-    {"hborder":128,"hport":1080,"hspeed":-1,"hview":360,"inherit":false,"objectId":{"name":"obj_cam","path":"objects/obj_cam/obj_cam.yy",},"vborder":90,"visible":true,"vspeed":-1,"wport":1920,"wview":640,"xport":0,"xview":0,"yport":0,"yview":0,},
+    {"hborder":128,"hport":1080,"hspeed":-1,"hview":540,"inherit":false,"objectId":{"name":"obj_cam","path":"objects/obj_cam/obj_cam.yy",},"vborder":90,"visible":true,"vspeed":-1,"wport":1920,"wview":960,"xport":0,"xview":0,"yport":0,"yview":0,},
     {"hborder":32,"hport":768,"hspeed":-1,"hview":768,"inherit":false,"objectId":null,"vborder":32,"visible":false,"vspeed":-1,"wport":1366,"wview":1366,"xport":0,"xview":0,"yport":0,"yview":0,},
     {"hborder":32,"hport":768,"hspeed":-1,"hview":768,"inherit":false,"objectId":null,"vborder":32,"visible":false,"vspeed":-1,"wport":1366,"wview":1366,"xport":0,"xview":0,"yport":0,"yview":0,},
     {"hborder":32,"hport":768,"hspeed":-1,"hview":768,"inherit":false,"objectId":null,"vborder":32,"visible":false,"vspeed":-1,"wport":1366,"wview":1366,"xport":0,"xview":0,"yport":0,"yview":0,},

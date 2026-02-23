@@ -1,26 +1,35 @@
-current_tab = INVENTARIO_TAB.AMULETOS;
+current_tab = INVENTARIO_TAB.STATUS; 
 cursor_col  = 0; 
 cursor_row  = 0; 
 scroll_row  = 0; 
-
 
 cursor_lerp_x = 0;
 cursor_lerp_y = 0;
 cursor_scale  = 1; 
 
-
 key_item_cols = 4;
 array_itens_filtrados = [];
 surf_items = -1; 
-lista_abas = [INVENTARIO_TAB.AMULETOS, INVENTARIO_TAB.ITENS, INVENTARIO_TAB.MELHORIAS, INVENTARIO_TAB.ESSENCIAS];
 
-
+lista_abas = [
+    INVENTARIO_TAB.STATUS, 
+    INVENTARIO_TAB.MAPA, 
+    INVENTARIO_TAB.ITENS, 
+    INVENTARIO_TAB.AMULETOS, 
+    INVENTARIO_TAB.MELHORIAS, 
+    INVENTARIO_TAB.ESSENCIAS,
+    INVENTARIO_TAB.BESTIARIO
+];
 
 // Filtra itens por aba
 atualiza_lista_filtrada = function()
 {
     array_itens_filtrados = [];
-    if (current_tab == INVENTARIO_TAB.AMULETOS) return;
+    
+    if (current_tab == INVENTARIO_TAB.AMULETOS or 
+        current_tab == INVENTARIO_TAB.STATUS or 
+        current_tab == INVENTARIO_TAB.MAPA or 
+        current_tab == INVENTARIO_TAB.BESTIARIO) return;
 
     if (variable_global_exists("itens_chave") and ds_exists(global.itens_chave, ds_type_map))
     {
@@ -124,12 +133,15 @@ navega_inventario = function()
         }
     }
 
-    // Executa Troca de Aba
+    // Executa Troca de Aba Dinâmica
     if (_troca_aba != 0)
     {
         var _idx = 0;
-        for (var i = 0; i < array_length(lista_abas); i++) if (lista_abas[i] == current_tab) { _idx = i; break; }
-        current_tab = lista_abas[(_idx + _troca_aba + 4) % 4];
+        var _tot_abas = array_length(lista_abas);
+        
+        for (var i = 0; i < _tot_abas; i++) if (lista_abas[i] == current_tab) { _idx = i; break; }
+        
+        current_tab = lista_abas[(_idx + _troca_aba + _tot_abas) % _tot_abas];
         
         cursor_lerp_x = -1; 
         atualiza_lista_filtrada();
@@ -158,45 +170,24 @@ navega_inventario = function()
     }    
 }
 
-// Renderização Principal
-desenha_inventario = function()
+// ==============================================================
+//                    FUNÇÕES DE DESENHO (MÓDULOS)
+// ==============================================================
+
+desenha_fundo_e_abas = function(_inv_x, _inv_y, _inv_w, _inv_h, _head_h)
 {
-    var _gui_w = display_get_gui_width();
-    var _gui_h = display_get_gui_height();
-    
-    // --- 2. DEFINIÇÃO DE FONTE OBRIGATÓRIA ---
-    // Isso conserta o problema de "sem fonte" e "texto pequeno"
-    draw_set_font(fnt_dialogo); // <--- GARANTA QUE ESSA FONTE TENHA O RANGE LATIN 1 E SDF
-    
-    // Layout
-    var _inv_w = _gui_w * 0.80; 
-    var _inv_h = _gui_h * 0.80;
-    var _inv_x = (_gui_w - _inv_w)/2; 
-    var _inv_y = (_gui_h - _inv_h)/2;
-    
-    var _pad_x = _inv_w * 0.03; 
-    var _pad_y = _inv_h * 0.05; 
-    var _head_h = _inv_h * 0.15;
-    
-    var _cont_y = _inv_y + _head_h;
-    var _cont_h = _inv_h - _head_h - _pad_y;
-    
-    var _area_itens_w = (_inv_w - (_pad_x*3)) * 0.60;
-    var _area_desc_w  = (_inv_w - (_pad_x*3)) * 0.40;
-    var _area_itens_x = _inv_x + _pad_x;
-    var _area_desc_x  = _area_itens_x + _area_itens_w + _pad_x;
-    
     draw_sprite_stretched(spr_inventario_fundo, 0, _inv_x, _inv_y, _inv_w, _inv_h);
     
-    // Abas
-    draw_set_valign(fa_middle); draw_set_halign(fa_center); 
+    draw_set_valign(fa_middle); 
+    draw_set_halign(fa_center); 
     var _tab_y = _inv_y + (_head_h / 2);
     
-    var _keys = ["tab_amuletos", "tab_itens", "tab_melhorias", "tab_essencias"];
-    var _enums = [INVENTARIO_TAB.AMULETOS, INVENTARIO_TAB.ITENS, INVENTARIO_TAB.MELHORIAS, INVENTARIO_TAB.ESSENCIAS];
-    var _div = _inv_w / 4; 
+    var _keys = ["tab_status", "tab_mapa", "tab_itens", "tab_amuletos", "tab_melhorias", "tab_essencias", "tab_bestiario"];
+    var _enums = lista_abas; 
+    var _tot_abas = array_length(_enums);
+    var _div = _inv_w / _tot_abas; 
     
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < _tot_abas; i++) {
         var _sel = (current_tab == _enums[i]);
         var _c = _sel ? c_white : c_gray;
         var _txt = get_text(_keys[i]);
@@ -205,123 +196,165 @@ desenha_inventario = function()
         if (_sel) draw_text_color(_tx, _tab_y, "["+_txt+"]", c_yellow, c_yellow, c_yellow, c_yellow, 1);
         else draw_text_color(_tx, _tab_y, _txt, _c, _c, _c, _c, 0.4);
     }
+}
+
+desenha_aba_status = function(_inv_x, _inv_w, _cont_y, _cont_h)
+{
+    var _margem = 40;
+    var _meio_x = _inv_x + (_inv_w / 2);
+    var _col1_x = _inv_x + _margem * 2;
+    var _col2_x = _meio_x + _margem;
+    var _linha_y = _cont_y + 20;
+    var _espaco_linhas = 40;
     
-    cursor_scale = lerp(cursor_scale, 1, 0.2);
-
-    // --- GRID AMULETOS ---
-    if (current_tab == INVENTARIO_TAB.AMULETOS)
-    {
-        var _cols = ds_grid_width(global.inventario);
-        var _lins = ds_grid_height(global.inventario);
-        var _sep = 8; 
-        var _sz = min((_area_itens_w - ((_cols-1)*_sep))/_cols, ((_cont_h-30)-((_lins-1)*_sep))/_lins);
-        
-        var _tx = 0; var _ty = 0; 
-        
-        // 1. Desenha Fundos
-        for (var _i = 0; _i < _lins; _i++) {
-            for (var _j = 0; _j < _cols; _j++) {
-                var _xx = _area_itens_x + _j * (_sz + _sep);
-                var _yy = _cont_y + _i * (_sz + _sep);
-                var _item = global.inventario[# _j, _i];
-                
-                if (cursor_col == _j and cursor_row == _i) { _tx = _xx; _ty = _yy; }
-                
-                var _frm = (is_struct(_item) and _item.equipado) ? 2 : 0;   
-                draw_sprite_stretched(spr_inventario_caixa, _frm, _xx, _yy, _sz, _sz);
-            }
+    draw_set_halign(fa_left); draw_set_valign(fa_top);
+    
+    // Coluna 1: Atributos
+    draw_set_color(c_yellow);
+    draw_text(_col1_x, _linha_y, get_text("status_titulo_atributos"));
+    draw_set_color(c_white);
+    
+    var _atr_y = _linha_y + _espaco_linhas * 1.5;
+    draw_text(_col1_x, _atr_y, get_text("status_vida") + ": " + string(global.vida_max)); _atr_y += _espaco_linhas;
+    draw_text(_col1_x, _atr_y, get_text("status_dano") + ": " + string(global.dano)); _atr_y += _espaco_linhas;
+    draw_text(_col1_x, _atr_y, get_text("status_velocidade") + ": " + string(global.velh_calculada)); _atr_y += _espaco_linhas;
+    draw_text(_col1_x, _atr_y, get_text("status_slots") + ": " + string(global.player_slots_maximos)); _atr_y += _espaco_linhas * 1.5;
+    
+    var _t = global.tempo_de_jogo_segundos;
+    var _str_tempo = string(_t div 3600) + "h " + (((_t mod 3600) div 60) < 10 ? "0" : "") + string((_t mod 3600) div 60) + "m " + ((_t mod 60) < 10 ? "0" : "") + string(_t mod 60) + "s";
+    draw_set_color(c_gray);
+    draw_text(_col1_x, _atr_y, get_text("status_tempo") + ": " + _str_tempo);
+    
+    // Coluna 2: Habilidades
+    draw_set_color(c_yellow);
+    draw_text(_col2_x, _linha_y, get_text("status_titulo_habilidades"));
+    
+    var _hab_y = _linha_y + _espaco_linhas * 1.5;
+    var _nomes_hab = ["hab_dash", "hab_walljump", "hab_doublejump", "hab_combo", "hab_float", "hab_mark"];
+    
+    for (var i = 0; i < array_length(_nomes_hab); i++) {
+        if (global.powerups[i]) {
+            draw_set_color(c_white); draw_text(_col2_x, _hab_y, "- " + get_text(_nomes_hab[i]));
+        } else {
+            draw_set_color(c_dkgray); draw_text(_col2_x, _hab_y, "- ???");
         }
-        
-        // 2. Desenha Cursor (Em cima do fundo, Em baixo do item)
-        if (cursor_lerp_x == -1) { cursor_lerp_x = _tx; cursor_lerp_y = _ty; }
-        else { cursor_lerp_x = lerp(cursor_lerp_x, _tx, 0.25); cursor_lerp_y = lerp(cursor_lerp_y, _ty, 0.25); }
-        
-        var _csz = _sz * cursor_scale;
-        draw_sprite_stretched(spr_inventario_caixa, 1, cursor_lerp_x + (_sz-_csz)/2, cursor_lerp_y + (_sz-_csz)/2, _csz, _csz);
-
-        // 3. Desenha Itens
-        for (var _i = 0; _i < _lins; _i++) {
-            for (var _j = 0; _j < _cols; _j++) {
-                var _xx = _area_itens_x + _j * (_sz + _sep);
-                var _yy = _cont_y + _i * (_sz + _sep);
-                var _item = global.inventario[# _j, _i];
-                
-                if (is_struct(_item)) {
-                    var _p = _sz * 0.15;
-                    draw_sprite_stretched(_item.spr, _item.meu_id, _xx+_p, _yy+_p, _sz-(_p*2), _sz-(_p*2));
-                }
-            }
-        }
-        
-        draw_set_halign(fa_left); draw_set_valign(fa_bottom);
-        draw_text(_area_itens_x, _inv_y + _inv_h - (_pad_y/2), get_text("inv_slots") + " " + string(global.player_slots_usados) + "/" + string(global.player_slots_maximos));
+        _hab_y += _espaco_linhas;
     }
-    // --- LISTAS ---
-    else 
-    {
-        var _cols = key_item_cols; var _sep = 8;
-        var _sz = (_area_itens_w - ((_cols-1) * _sep)) / _cols;
-        
-        if (!surface_exists(surf_items)) surf_items = surface_create(_area_itens_w, _cont_h);
-        
-        surface_set_target(surf_items);
-        draw_clear_alpha(c_black, 0); 
-        
-        var _len = array_length(array_itens_filtrados);
-        if (_len == 0) { 
-            draw_set_halign(fa_center); draw_set_valign(fa_middle);
-            draw_set_color(c_gray); draw_text(_area_itens_w/2, _cont_h/2, get_text("inv_vazio"));
+    
+    draw_set_color(c_gray); draw_set_alpha(0.3);
+    draw_line(_meio_x, _linha_y, _meio_x, _hab_y);
+    draw_set_alpha(1.0);
+}
+
+desenha_aba_amuletos = function(_area_x, _cont_y, _area_w, _cont_h, _inv_y, _inv_h, _pad_y)
+{
+    var _cols = ds_grid_width(global.inventario);
+    var _lins = ds_grid_height(global.inventario);
+    var _sep = 8; 
+    var _sz = min((_area_w - ((_cols-1)*_sep))/_cols, ((_cont_h-30)-((_lins-1)*_sep))/_lins);
+    var _tx = 0; var _ty = 0; 
+    
+    // 1. Fundos
+    for (var _i = 0; _i < _lins; _i++) {
+        for (var _j = 0; _j < _cols; _j++) {
+            var _xx = _area_x + _j * (_sz + _sep);
+            var _yy = _cont_y + _i * (_sz + _sep);
+            var _item = global.inventario[# _j, _i];
+            
+            if (cursor_col == _j and cursor_row == _i) { _tx = _xx; _ty = _yy; }
+            var _frm = (is_struct(_item) and _item.equipado) ? 2 : 0;   
+            draw_sprite_stretched(spr_inventario_caixa, _frm, _xx, _yy, _sz, _sz);
         }
-        else
-        {
-            var _tx = -1; var _ty = -1;
+    }
+    
+    // 2. Cursor
+    if (cursor_lerp_x == -1) { cursor_lerp_x = _tx; cursor_lerp_y = _ty; }
+    else { cursor_lerp_x = lerp(cursor_lerp_x, _tx, 0.25); cursor_lerp_y = lerp(cursor_lerp_y, _ty, 0.25); }
+    var _csz = _sz * cursor_scale;
+    draw_sprite_stretched(spr_inventario_caixa, 1, cursor_lerp_x + (_sz-_csz)/2, cursor_lerp_y + (_sz-_csz)/2, _csz, _csz);
 
-            // 1. Fundos
-            for (var i = 0; i < _len; i++) {
-                var _c = i mod _cols; var _r = i div _cols;
-                var _xx = _c * (_sz + _sep);
-                var _yy = (_r * (_sz + _sep)) - (scroll_row * (_sz + _sep));
-                
-                if (cursor_col == _c and cursor_row == _r) { _tx = _xx; _ty = _yy; }
-                if (_yy + _sz > 0 and _yy < _cont_h) draw_sprite_stretched(spr_inventario_caixa, 0, _xx, _yy, _sz, _sz);
+    // 3. Itens
+    for (var _i = 0; _i < _lins; _i++) {
+        for (var _j = 0; _j < _cols; _j++) {
+            var _xx = _area_x + _j * (_sz + _sep);
+            var _yy = _cont_y + _i * (_sz + _sep);
+            var _item = global.inventario[# _j, _i];
+            
+            if (is_struct(_item)) {
+                var _p = _sz * 0.15;
+                draw_sprite_stretched(_item.spr, _item.meu_id, _xx+_p, _yy+_p, _sz-(_p*2), _sz-(_p*2));
             }
+        }
+    }
+    
+    draw_set_halign(fa_left); draw_set_valign(fa_bottom);
+    draw_text(_area_x, _inv_y + _inv_h - (_pad_y/2), get_text("inv_slots") + " " + string(global.player_slots_usados) + "/" + string(global.player_slots_maximos));
+}
 
-            // 2. Cursor
-            if (_tx != -1) {
-                if (cursor_lerp_x == -1) { cursor_lerp_x = _tx; cursor_lerp_y = _ty; }
-                else { cursor_lerp_x = lerp(cursor_lerp_x, _tx, 0.25); cursor_lerp_y = lerp(cursor_lerp_y, _ty, 0.25); }
-                var _csz = _sz * cursor_scale;
-                draw_sprite_stretched(spr_inventario_caixa, 1, cursor_lerp_x + (_sz-_csz)/2, cursor_lerp_y + (_sz-_csz)/2, _csz, _csz);
-            }
+desenha_aba_listas = function(_area_x, _cont_y, _area_w, _cont_h)
+{
+    var _cols = key_item_cols; var _sep = 8;
+    var _sz = (_area_w - ((_cols-1) * _sep)) / _cols;
+    
+    if (!surface_exists(surf_items)) surf_items = surface_create(_area_w, _cont_h);
+    
+    surface_set_target(surf_items);
+    draw_clear_alpha(c_black, 0); 
+    
+    var _len = array_length(array_itens_filtrados);
+    if (_len == 0) { 
+        draw_set_halign(fa_center); draw_set_valign(fa_middle);
+        draw_set_color(c_gray); draw_text(_area_w/2, _cont_h/2, get_text("inv_vazio"));
+    }
+    else {
+        var _tx = -1; var _ty = -1;
 
-            // 3. Itens
-            for (var i = 0; i < _len; i++) {
-                var _c = i mod _cols; var _r = i div _cols;
-                var _xx = _c * (_sz + _sep);
-                var _yy = (_r * (_sz + _sep)) - (scroll_row * (_sz + _sep));
-                
-                if (_yy + _sz > 0 and _yy < _cont_h) {
-                    var _id = array_itens_filtrados[i];
-                    var _d = pega_dados_item(_id);
-                    if (_d != undefined) {
-                        var _p = _sz * 0.15;
-                        draw_sprite_stretched(_d.spr, 0, _xx+_p, _yy+_p, _sz-(_p*2), _sz-(_p*2));
-                        
-                        var _q = global.itens_chave[? _id]; 
-                        if (_q > 1) {
-                            draw_set_halign(fa_right); draw_set_valign(fa_bottom); draw_set_font(fnt_dialogo);
-                            draw_set_color(c_black); draw_text_transformed(_xx+_sz-2, _yy+_sz+2, string(_q), 0.7, 0.7, 0);
-                            draw_set_color(c_white); draw_text_transformed(_xx+_sz-4, _yy+_sz-4, string(_q), 0.7, 0.7, 0);
-                        }
+        // Fundos e identificação do cursor
+        for (var i = 0; i < _len; i++) {
+            var _c = i mod _cols; var _r = i div _cols;
+            var _xx = _c * (_sz + _sep);
+            var _yy = (_r * (_sz + _sep)) - (scroll_row * (_sz + _sep));
+            if (cursor_col == _c and cursor_row == _r) { _tx = _xx; _ty = _yy; }
+            if (_yy + _sz > 0 and _yy < _cont_h) draw_sprite_stretched(spr_inventario_caixa, 0, _xx, _yy, _sz, _sz);
+        }
+
+        // Cursor
+        if (_tx != -1) {
+            if (cursor_lerp_x == -1) { cursor_lerp_x = _tx; cursor_lerp_y = _ty; }
+            else { cursor_lerp_x = lerp(cursor_lerp_x, _tx, 0.25); cursor_lerp_y = lerp(cursor_lerp_y, _ty, 0.25); }
+            var _csz = _sz * cursor_scale;
+            draw_sprite_stretched(spr_inventario_caixa, 1, cursor_lerp_x + (_sz-_csz)/2, cursor_lerp_y + (_sz-_csz)/2, _csz, _csz);
+        }
+
+        // Desenho dos Itens na superfície
+        for (var i = 0; i < _len; i++) {
+            var _c = i mod _cols; var _r = i div _cols;
+            var _xx = _c * (_sz + _sep);
+            var _yy = (_r * (_sz + _sep)) - (scroll_row * (_sz + _sep));
+            
+            if (_yy + _sz > 0 and _yy < _cont_h) {
+                var _id = array_itens_filtrados[i];
+                var _d = pega_dados_item(_id);
+                if (_d != undefined) {
+                    var _p = _sz * 0.15;
+                    draw_sprite_stretched(_d.spr, 0, _xx+_p, _yy+_p, _sz-(_p*2), _sz-(_p*2));
+                    
+                    var _q = global.itens_chave[? _id]; 
+                    if (_q > 1) {
+                        draw_set_halign(fa_right); draw_set_valign(fa_bottom); draw_set_font(fnt_dialogo);
+                        draw_set_color(c_black); draw_text_transformed(_xx+_sz-2, _yy+_sz+2, string(_q), 0.7, 0.7, 0);
+                        draw_set_color(c_white); draw_text_transformed(_xx+_sz-4, _yy+_sz-4, string(_q), 0.7, 0.7, 0);
                     }
                 }
             }
         }
-        surface_reset_target();
-        draw_surface(surf_items, _area_itens_x, _cont_y);
     }
-    
-    // Painel Info
+    surface_reset_target();
+    draw_surface(surf_items, _area_x, _cont_y);
+}
+
+desenha_painel_info = function(_desc_x, _desc_w, _cont_y)
+{
     var _sel = undefined;
     if (current_tab == INVENTARIO_TAB.AMULETOS) _sel = global.inventario[# cursor_col, cursor_row];
     else {
@@ -332,12 +365,12 @@ desenha_inventario = function()
     if (_sel != undefined and _sel != 0) {
         var _d = pega_dados_item(_sel);
         if (_d != undefined) {
-            var _isz = 96; var _ixc = _area_desc_x + (_area_desc_w - _isz)/2;
+            var _isz = 96; var _ixc = _desc_x + (_desc_w - _isz)/2;
             var _frm = is_struct(_sel) ? _sel.meu_id : 0;
             draw_sprite_stretched(_d.spr, _frm, _ixc, _cont_y, _isz, _isz);
             
             draw_set_halign(fa_center); draw_set_valign(fa_top);
-            draw_set_color(c_yellow); draw_text_ext(_area_desc_x + _area_desc_w/2, _cont_y + 120, get_text(_d.nome_key), 24, _area_desc_w);
+            draw_set_color(c_yellow); draw_text_ext(_desc_x + _desc_w/2, _cont_y + 120, get_text(_d.nome_key), 24, _desc_w);
             draw_set_color(c_white); 
             
             var _desc = get_text(_d.desc_key);
@@ -345,8 +378,67 @@ desenha_inventario = function()
                  var _q = global.itens_chave[? _sel];
                  if (_q > 1) _desc += "\n(x" + string(_q) + ")";
             }
-            draw_text_ext(_area_desc_x + _area_desc_w/2, _cont_y + 160, _desc, 20, _area_desc_w);
+            draw_text_ext(_desc_x + _desc_w/2, _cont_y + 160, _desc, 20, _desc_w);
         }
     }
+}
+
+
+// ==============================================================
+//             RENDERIZAÇÃO PRINCIPAL (FICOU ENXUTA!)
+// ==============================================================
+
+desenha_inventario = function()
+{
+    var _gui_w = display_get_gui_width();
+    var _gui_h = display_get_gui_height();
+    draw_set_font(fnt_dialogo); 
+    
+    // Layout Principal
+    var _inv_w = _gui_w * 0.95; 
+    var _inv_h = _gui_h * 0.95;
+    var _inv_x = (_gui_w - _inv_w)/2; 
+    var _inv_y = (_gui_h - _inv_h)/2;
+    
+    var _pad_x = _inv_w * 0.03; 
+    var _pad_y = _inv_h * 0.05; 
+    var _head_h = _inv_h * 0.12;
+    var _cont_y = _inv_y + _head_h;
+    var _cont_h = _inv_h - _head_h - _pad_y;
+    
+    var _area_itens_w = (_inv_w - (_pad_x*3)) * 0.60;
+    var _area_desc_w  = (_inv_w - (_pad_x*3)) * 0.40;
+    var _area_itens_x = _inv_x + _pad_x;
+    var _area_desc_x  = _area_itens_x + _area_itens_w + _pad_x;
+    
+    cursor_scale = lerp(cursor_scale, 1, 0.2);
+
+    // 1. Fundo e Abas Superiores
+    desenha_fundo_e_abas(_inv_x, _inv_y, _inv_w, _inv_h, _head_h);
+
+    // 2. Conteúdo Dinâmico por Aba
+    if (current_tab == INVENTARIO_TAB.AMULETOS) {
+        desenha_aba_amuletos(_area_itens_x, _cont_y, _area_itens_w, _cont_h, _inv_y, _inv_h, _pad_y);
+    }
+    else if (current_tab == INVENTARIO_TAB.ITENS or current_tab == INVENTARIO_TAB.MELHORIAS or current_tab == INVENTARIO_TAB.ESSENCIAS) {
+        desenha_aba_listas(_area_itens_x, _cont_y, _area_itens_w, _cont_h);
+    }
+    else if (current_tab == INVENTARIO_TAB.STATUS) {
+        desenha_aba_status(_inv_x, _inv_w, _cont_y, _cont_h);
+    }
+    else if (current_tab == INVENTARIO_TAB.MAPA) {
+        draw_set_halign(fa_center); draw_set_valign(fa_middle);
+        draw_text(_inv_x + _inv_w/2, _cont_y + _cont_h/2, "- WIP: Mapa do Jogo -");
+    }
+    else if (current_tab == INVENTARIO_TAB.BESTIARIO) {
+        draw_set_halign(fa_center); draw_set_valign(fa_middle);
+        draw_text(_inv_x + _inv_w/2, _cont_y + _cont_h/2, "- WIP: Bestiario -");
+    }
+    
+    // 3. Painel de Informações Lateral (se for aba de itens)
+    if (current_tab == INVENTARIO_TAB.AMULETOS or current_tab == INVENTARIO_TAB.ITENS or current_tab == INVENTARIO_TAB.MELHORIAS or current_tab == INVENTARIO_TAB.ESSENCIAS) {
+        desenha_painel_info(_area_desc_x, _area_desc_w, _cont_y);
+    }
+    
     draw_set_halign(-1); draw_set_valign(-1); draw_set_font(-1); draw_set_color(c_white);
 }

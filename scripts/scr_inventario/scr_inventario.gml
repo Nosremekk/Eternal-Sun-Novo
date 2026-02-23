@@ -1,4 +1,14 @@
-enum INVENTARIO_TAB { AMULETOS, ITENS, MELHORIAS, ESSENCIAS }
+// Substitua o enum atual por este:
+enum INVENTARIO_TAB 
+{ 
+    STATUS, 
+    MAPA, 
+    ITENS, 
+    AMULETOS, 
+    MELHORIAS, 
+    ESSENCIAS, 
+    BESTIARIO 
+}
 // --- MACROS (IDs CONSTANTES) ---
 #macro KEY_MARCO_PAPP "key_dungeon_marco"
 #macro KEY_MAPA_MUNDO "key_map_world"
