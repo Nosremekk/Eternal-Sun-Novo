@@ -6,7 +6,7 @@ event_inherited();
 
 formulario_inimigo(5,.45,,,,0,200,0);
 
-
+meu_id_bestiario = "inimigo_voa";
 
 //Este inimigo vai ficar andando... e só mesmo
 //Iniciando estados

@@ -518,6 +518,7 @@
     {"id":{"name":"InputVirtualDestroyAll","path":"scripts/InputVirtualDestroyAll/InputVirtualDestroyAll.yy",},},
     {"id":{"name":"InputX","path":"scripts/InputX/InputX.yy",},},
     {"id":{"name":"InputY","path":"scripts/InputY/InputY.yy",},},
+    {"id":{"name":"scr_bestiario","path":"scripts/scr_bestiario/scr_bestiario.yy",},},
     {"id":{"name":"scr_dano","path":"scripts/scr_dano/scr_dano.yy",},},
     {"id":{"name":"scr_efeitos","path":"scripts/scr_efeitos/scr_efeitos.yy",},},
     {"id":{"name":"scr_inimigos","path":"scripts/scr_inimigos/scr_inimigos.yy",},},

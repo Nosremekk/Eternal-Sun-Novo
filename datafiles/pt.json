@@ -119,5 +119,6 @@
     "hab_doublejump": "Pulo Duplo",
     "hab_combo": "Mestre do Combo",
     "hab_float": "Flutuar",
-    "hab_mark": "Marca Espectral"
+    "hab_mark": "Marca Espectral",
+    "ui_bestiario_get": "PESQUISA CONCLUÍDA",
 }

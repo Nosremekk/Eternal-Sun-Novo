@@ -345,3 +345,5 @@ function get_inimigo_key()
 {
     return room_get_name(room) + "_" + string(xstart) + "_" + string(ystart);
 }
+
+

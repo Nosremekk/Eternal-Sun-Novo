@@ -8,6 +8,8 @@ event_inherited();
 formulario_inimigo(70,2,4,0,0,,150,100);
 formulario_tiro(5,1.5,3,true,true);
 
+meu_id_bestiario = "primeiro_boss";
+show_message(global.bestiario_kills)
 duracao = 2;
 
 //Segunda fase?

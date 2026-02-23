@@ -7,7 +7,7 @@ var _s = max(1, _gui_h / ESCALA_UI);
 
 draw_set_font(fnt_dialogo);
 
-var _titulo = get_text("ui_item_get");
+var _titulo = get_text(titulo_key);
 var _texto  = get_text(texto_key);
 
 // Configs de Layout
@@ -56,12 +56,22 @@ var _final_scale = _scale_spr * _s;
 var _final_w = _spr_w * _final_scale;
 var _final_h = _spr_h * _final_scale;
 
-// Centro da área do ícone
+// Posição central EXATA do quadrado escuro
 var _cx = _x + _pad + (_icon_size / 2);
 var _cy = _y + (_h_box / 2);
 
-// Desenha frame 0 centralizado
-draw_sprite_ext(sprite, 0, _cx - (_final_w/2), _cy - (_final_h/2), _final_scale, _final_scale, 0, c_white, alpha);
+// --- COMPENSAÇÃO DINÂMICA DE ORIGEM ---
+// Lê a origem da sprite e aplica a escala atual
+var _xoff = sprite_get_xoffset(sprite) * _final_scale;
+var _yoff = sprite_get_yoffset(sprite) * _final_scale;
+
+// Calcula a posição de desenho subtraindo a metade do tamanho (para centralizar a caixa)
+// e somando a origem real da sprite.
+var _draw_x = _cx - (_final_w / 2) + _xoff;
+var _draw_y = _cy - (_final_h / 2) + _yoff;
+
+// Desenha a sprite usando as coordenadas corrigidas
+draw_sprite_ext(sprite, 0, _draw_x, _draw_y, _final_scale, _final_scale, 0, c_white, alpha);
 
 
 draw_set_halign(fa_left); draw_set_valign(fa_top);

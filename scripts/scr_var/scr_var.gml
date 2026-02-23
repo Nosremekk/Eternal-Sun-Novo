@@ -235,6 +235,7 @@ function reset_variaveis_jogo()
     
     global.inimigos_mortos_temp = {};
     global.bosses_mortos        = {};
+    global.bestiario_kills      = {};
     global.inimigo_marcado = noone;
     global.timer_marcado = 0;
     global.marca_pos_x = 0;

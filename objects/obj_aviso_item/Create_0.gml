@@ -3,6 +3,7 @@ sprite = -1;
 subimg = 0; 
 
 // Configuração
+titulo_key = "ui_item_get";
 timer_vida = 2;
 estado_animacao = 0; 
 

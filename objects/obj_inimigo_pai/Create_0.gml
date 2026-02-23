@@ -6,6 +6,7 @@ event_inherited();
 //Ja fui morto?
 inimigo_key = noone;
 boss_key = noone;
+meu_id_bestiario = "";
 
 if (!e_boss) 
 {
@@ -194,7 +195,11 @@ function recebe_dano(_dano = 1)
         efeito_sonoro_3d(sfx_enemy_death, x, y, 100, 300, 80, 0.1);
         
         InputVibrateConstant(0.5, 0.0, 250)
+        
     }
+        
+
+
     
     knockback();
     

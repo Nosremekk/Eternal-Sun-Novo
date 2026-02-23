@@ -7,7 +7,7 @@ event_inherited();
 formulario_inimigo(3,1,4,,,.3,250,0);
 
 
-
+meu_id_bestiario = "inimigo_anda";
 
 
 //Este inimigo vai ficar andando... e só mesmo

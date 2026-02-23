@@ -117,6 +117,7 @@ function salvando_jogo(_save = global.save, _eh_checkpoint = false)
         },
         itens_chave_data : _struct_itens_chave,
         areas_visitadas  : global.areas_visitadas,
+        bestiario_kills  : global.bestiario_kills,
         bosses_mortos    : global.bosses_mortos,
         eventos_mundo    : global.eventos,
         objetos          : global.permanentemente_quebrado
@@ -194,6 +195,16 @@ function carrega_jogo(_save = global.save)
     {
         // Se o save for antigo e não tiver essa chave, inicia vazio para evitar erros
         global.permanentemente_quebrado = {};
+    }
+    
+    if (variable_struct_exists(global.dados_load_pendente, "bestiario_kills"))
+    {
+        global.bestiario_kills = global.dados_load_pendente.bestiario_kills;
+    }
+    else
+    {
+        // Se o save for antigo e não tiver, começa vazio
+        global.bestiario_kills = {}; 
     }
 
     global.inimigos_mortos_temp = {}; 

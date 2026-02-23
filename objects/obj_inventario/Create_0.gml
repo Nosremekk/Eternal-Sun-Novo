@@ -26,11 +26,31 @@ atualiza_lista_filtrada = function()
 {
     array_itens_filtrados = [];
     
-    if (current_tab == INVENTARIO_TAB.AMULETOS or 
-        current_tab == INVENTARIO_TAB.STATUS or 
-        current_tab == INVENTARIO_TAB.MAPA or 
-        current_tab == INVENTARIO_TAB.BESTIARIO) return;
+    // Abas que não usam listas ignoram o filtro
+    if (current_tab == INVENTARIO_TAB.AMULETOS or current_tab == INVENTARIO_TAB.STATUS or current_tab == INVENTARIO_TAB.MAPA) return;
 
+    // --- FILTRO DO BESTIÁRIO ---
+    if (current_tab == INVENTARIO_TAB.BESTIARIO)
+    {
+        if (variable_global_exists("db_bestiario") and variable_global_exists("bestiario_kills"))
+        {
+            var _nomes = variable_struct_get_names(global.db_bestiario);
+            for (var i = 0; i < array_length(_nomes); i++)
+            {
+                var _key = _nomes[i];
+                var _kills = global.bestiario_kills[$ _key];
+                
+                // Só adiciona na lista se o jogador já tiver matado pelo menos 1 vez
+                if (!is_undefined(_kills) and _kills > 0)
+                {
+                    array_push(array_itens_filtrados, _key);
+                }
+            }
+        }
+        return;
+    }
+
+    // --- FILTRO DE ITENS NORMAIS ---
     if (variable_global_exists("itens_chave") and ds_exists(global.itens_chave, ds_type_map))
     {
         var _key = ds_map_find_first(global.itens_chave);
@@ -87,12 +107,12 @@ navega_inventario = function()
             if (_ncol >= _cols) _troca_aba = 1;
             else if (_ncol < 0) _troca_aba = -1;
             else { cursor_col = _ncol; cursor_scale = 0.8; efeito_sonoro(sfx_menu_click, 50, 0.1); }
-            InputVibrateConstant(0.05, 0.0, 20)    
+            InputVibrateConstant(0.05, 0.0, 20);
         }
         if (_dy != 0) {
             cursor_row = (cursor_row + _dy + _lins) mod _lins;
             cursor_scale = 0.8; efeito_sonoro(sfx_menu_click, 50, 0.1);
-            InputVibrateConstant(0.05, 0.0, 20)
+            InputVibrateConstant(0.05, 0.0, 20);
         }
         
         if (_c.confirma) { 
@@ -100,21 +120,24 @@ navega_inventario = function()
             if (is_struct(_item)) { _item.alterna_equipamento(); efeito_sonoro(sfx_pause, 50, 0.1); }
         }
     }
-    // Listas
+    // Listas (Itens e Bestiário)
     else 
     {
         var _total = array_length(array_itens_filtrados);
         if (_total == 0) { if (_dx != 0) _troca_aba = _dx; }
         else
         {
-            var _rows = max(1, ceil(_total / key_item_cols));
+            // O Bestiário é uma lista de 1 coluna, as outras usam key_item_cols (ex: 4)
+            var _cols_atuais = (current_tab == INVENTARIO_TAB.BESTIARIO) ? 1 : key_item_cols;
+            var _rows = max(1, ceil(_total / _cols_atuais));
+            
             if (_dx != 0) 
             {
                 var _ncol = cursor_col + _dx;
-                if (_ncol >= key_item_cols) _troca_aba = 1;
+                if (_ncol >= _cols_atuais) _troca_aba = 1;
                 else if (_ncol < 0) _troca_aba = -1;
                 else {
-                    var _idx = (cursor_row * key_item_cols) + _ncol;
+                    var _idx = (cursor_row * _cols_atuais) + _ncol;
                     if (_idx < _total) { cursor_col = _ncol; cursor_scale = 0.8; efeito_sonoro(sfx_menu_click, 50, 0.1); }
                     else if (_dx > 0) _troca_aba = 1; 
                 }
@@ -122,12 +145,15 @@ navega_inventario = function()
             if (_dy != 0) {
                 var _nr = cursor_row + _dy;
                 if (_nr >= 0 and _nr < _rows) {
-                    var _idx = (_nr * key_item_cols) + cursor_col;
-                    if (_idx >= _total) cursor_col = (_total - 1) % key_item_cols;
+                    var _idx = (_nr * _cols_atuais) + cursor_col;
+                    if (_idx >= _total) cursor_col = (_total - 1) % _cols_atuais;
                     cursor_row = _nr;
                     cursor_scale = 0.8; efeito_sonoro(sfx_menu_click, 50, 0.1);
+                    
+                    // Ajuste de scroll dinâmico
+                    var _max_vis = (current_tab == INVENTARIO_TAB.BESTIARIO) ? 8 : 2; 
                     if (cursor_row < scroll_row) scroll_row = cursor_row;
-                    if (cursor_row > scroll_row + 2) scroll_row = cursor_row - 2; 
+                    if (cursor_row > scroll_row + _max_vis) scroll_row = cursor_row - _max_vis; 
                 }
             }
         }
@@ -151,14 +177,15 @@ navega_inventario = function()
         else {
             if (current_tab == INVENTARIO_TAB.AMULETOS) cursor_col = ds_grid_width(global.inventario) - 1;
             else {
-                cursor_col = key_item_cols - 1;
+                var _c_atuais = (current_tab == INVENTARIO_TAB.BESTIARIO) ? 1 : key_item_cols;
+                cursor_col = _c_atuais - 1;
                 var _tot = array_length(array_itens_filtrados);
                 if (current_tab != INVENTARIO_TAB.AMULETOS and _tot > 0) 
-                    while ((cursor_row * key_item_cols) + cursor_col >= _tot and cursor_col > 0) cursor_col--;
+                    while ((cursor_row * _c_atuais) + cursor_col >= _tot and cursor_col > 0) cursor_col--;
             }
         }
         efeito_sonoro(sfx_menu_click, 50, 0.15);
-        InputVibrateConstant(0.1, 0.0, 30)
+        InputVibrateConstant(0.1, 0.0, 30);
     }
     
     // Sair
@@ -246,6 +273,116 @@ desenha_aba_status = function(_inv_x, _inv_w, _cont_y, _cont_h)
     draw_set_alpha(1.0);
 }
 
+desenha_aba_bestiario = function(_area_x, _cont_y, _area_w, _cont_h, _area_desc_x, _area_desc_w)
+{
+    var _len = array_length(array_itens_filtrados);
+    
+    // Se não encontrou nenhum monstro ainda
+    if (_len == 0) {
+        draw_set_halign(fa_center); draw_set_valign(fa_middle);
+        draw_set_color(c_gray); draw_text(_area_x + _area_w/2, _cont_y + _cont_h/2, "- Bestiário Vazio -");
+        return;
+    }
+
+    // --- ESQUERDA: LISTA DE MONSTROS ---
+    var _alt_item = 44; 
+    
+    for (var i = 0; i < _len; i++) {
+        var _yy = _cont_y + (i - scroll_row) * _alt_item;
+        
+        // Renderiza só o que está visível no scroll
+        if (_yy >= _cont_y and _yy + _alt_item <= _cont_y + _cont_h) {
+            var _key = array_itens_filtrados[i];
+            var _data = global.db_bestiario[$ _key];
+            var _nome = get_text(_data.nome_key);
+            
+            var _c = (cursor_row == i) ? c_yellow : c_white;
+            
+            if (cursor_row == i) {
+                draw_set_alpha(0.2); draw_set_color(c_yellow);
+                draw_rectangle(_area_x, _yy, _area_x + _area_w, _yy + _alt_item - 4, false);
+                draw_set_alpha(1.0);
+            }
+            
+            draw_set_halign(fa_left); draw_set_valign(fa_middle);
+            draw_set_color(_c);
+            draw_text(_area_x + 15, _yy + (_alt_item/2) - 2, _nome);
+        }
+    }
+
+    // --- DIREITA: DETALHES E ANIMAÇÃO ---
+    if (cursor_row < _len) {
+        var _key = array_itens_filtrados[cursor_row];
+        var _data = global.db_bestiario[$ _key];
+        var _kills = global.bestiario_kills[$ _key];
+        var _req = _data.mortes_req;
+        
+        var _completo = (_kills >= _req);
+        var _cx = _area_desc_x + (_area_desc_w / 2);
+        var _cy = _cont_y + 120; // Centro da sprite
+        
+        // 1. ANIMAÇÃO VIVA DO MONSTRO E COMPENSAÇÃO DE ORIGEM
+        var _spr = _data.spr;
+        var _frames = sprite_get_number(_spr);
+        var _img_animada = (current_time / 150) mod _frames; 
+        
+        var _escala = 2; // Inimigos desenhados com o dobro do tamanho
+        var _spr_w = sprite_get_width(_spr) * _escala;
+        var _spr_h = sprite_get_height(_spr) * _escala;
+        
+        // Pega a origem do inimigo (Bottom Center)
+        var _xoff = sprite_get_xoffset(_spr) * _escala;
+        var _yoff = sprite_get_yoffset(_spr) * _escala;
+        
+        // Aplica o cálculo matemático de centro
+        var _draw_x = _cx - (_spr_w / 2) + _xoff;
+        var _draw_y = _cy - (_spr_h / 2) + _yoff;
+        
+        if (_completo) {
+            // Desenha o monstro normal
+            draw_sprite_ext(_spr, _img_animada, _draw_x, _draw_y, _escala, _escala, 0, c_white, 1);
+        } else {
+            // Desenha a silhueta preta
+            gpu_set_fog(true, c_black, 0, 0);
+            draw_sprite_ext(_spr, _img_animada, _draw_x, _draw_y, _escala, _escala, 0, c_white, 1);
+            gpu_set_fog(false, c_black, 0, 0);
+        }
+        
+        // 2. TEXTOS (Nomes e Atributos)
+        var _texto_y = _cy + 80;
+        draw_set_halign(fa_center); draw_set_valign(fa_top);
+        
+        draw_set_color(c_yellow);
+        draw_text(_cx, _texto_y, get_text(_data.nome_key));
+        _texto_y += 35;
+        
+        if (_completo) {
+            // Stats revelados
+            draw_set_color(c_white);
+            draw_text(_cx, _texto_y, "HP: " + string(_data.vida) + "  |  Dano: " + string(_data.dano));
+            _texto_y += 50;
+            
+            // Descrição da Lore
+            draw_text_ext(_cx, _texto_y, get_text(_data.desc_key), 22, _area_desc_w - 20);
+            
+            // Contador de Abates (Completo)
+            draw_set_color(c_gray);
+            draw_text(_cx, _cont_y + _cont_h - 40, "Abates totais: " + string(_kills));
+        } else {
+            // Stats e descrições ocultas
+            draw_set_color(c_gray);
+            draw_text(_cx, _texto_y, "HP: ???  |  Dano: ???");
+            _texto_y += 50;
+            
+            draw_text_ext(_cx, _texto_y, "Continue caçando esta criatura para revelar sua pesquisa completa.", 22, _area_desc_w - 20);
+            
+            // Contador de Abates (Progresso)
+            draw_set_color(c_white);
+            draw_text(_cx, _cont_y + _cont_h - 40, "Pesquisa: " + string(_kills) + " / " + string(_req));
+        }
+    }
+}
+
 desenha_aba_amuletos = function(_area_x, _cont_y, _area_w, _cont_h, _inv_y, _inv_h, _pad_y)
 {
     var _cols = ds_grid_width(global.inventario);
@@ -254,7 +391,7 @@ desenha_aba_amuletos = function(_area_x, _cont_y, _area_w, _cont_h, _inv_y, _inv
     var _sz = min((_area_w - ((_cols-1)*_sep))/_cols, ((_cont_h-30)-((_lins-1)*_sep))/_lins);
     var _tx = 0; var _ty = 0; 
     
-    // 1. Fundos
+    // Fundos
     for (var _i = 0; _i < _lins; _i++) {
         for (var _j = 0; _j < _cols; _j++) {
             var _xx = _area_x + _j * (_sz + _sep);
@@ -267,13 +404,13 @@ desenha_aba_amuletos = function(_area_x, _cont_y, _area_w, _cont_h, _inv_y, _inv
         }
     }
     
-    // 2. Cursor
+    // Cursor
     if (cursor_lerp_x == -1) { cursor_lerp_x = _tx; cursor_lerp_y = _ty; }
     else { cursor_lerp_x = lerp(cursor_lerp_x, _tx, 0.25); cursor_lerp_y = lerp(cursor_lerp_y, _ty, 0.25); }
     var _csz = _sz * cursor_scale;
     draw_sprite_stretched(spr_inventario_caixa, 1, cursor_lerp_x + (_sz-_csz)/2, cursor_lerp_y + (_sz-_csz)/2, _csz, _csz);
 
-    // 3. Itens
+    // Itens
     for (var _i = 0; _i < _lins; _i++) {
         for (var _j = 0; _j < _cols; _j++) {
             var _xx = _area_x + _j * (_sz + _sep);
@@ -309,7 +446,7 @@ desenha_aba_listas = function(_area_x, _cont_y, _area_w, _cont_h)
     else {
         var _tx = -1; var _ty = -1;
 
-        // Fundos e identificação do cursor
+        // Fundos
         for (var i = 0; i < _len; i++) {
             var _c = i mod _cols; var _r = i div _cols;
             var _xx = _c * (_sz + _sep);
@@ -326,7 +463,7 @@ desenha_aba_listas = function(_area_x, _cont_y, _area_w, _cont_h)
             draw_sprite_stretched(spr_inventario_caixa, 1, cursor_lerp_x + (_sz-_csz)/2, cursor_lerp_y + (_sz-_csz)/2, _csz, _csz);
         }
 
-        // Desenho dos Itens na superfície
+        // Itens
         for (var i = 0; i < _len; i++) {
             var _c = i mod _cols; var _r = i div _cols;
             var _xx = _c * (_sz + _sep);
@@ -423,16 +560,16 @@ desenha_inventario = function()
     else if (current_tab == INVENTARIO_TAB.ITENS or current_tab == INVENTARIO_TAB.MELHORIAS or current_tab == INVENTARIO_TAB.ESSENCIAS) {
         desenha_aba_listas(_area_itens_x, _cont_y, _area_itens_w, _cont_h);
     }
+    else if (current_tab == INVENTARIO_TAB.BESTIARIO) {
+        // --- CHAMA O BESTIÁRIO AQUI ---
+        desenha_aba_bestiario(_area_itens_x, _cont_y, _area_itens_w, _cont_h, _area_desc_x, _area_desc_w);
+    }
     else if (current_tab == INVENTARIO_TAB.STATUS) {
         desenha_aba_status(_inv_x, _inv_w, _cont_y, _cont_h);
     }
     else if (current_tab == INVENTARIO_TAB.MAPA) {
         draw_set_halign(fa_center); draw_set_valign(fa_middle);
         draw_text(_inv_x + _inv_w/2, _cont_y + _cont_h/2, "- WIP: Mapa do Jogo -");
-    }
-    else if (current_tab == INVENTARIO_TAB.BESTIARIO) {
-        draw_set_halign(fa_center); draw_set_valign(fa_middle);
-        draw_text(_inv_x + _inv_w/2, _cont_y + _cont_h/2, "- WIP: Bestiario -");
     }
     
     // 3. Painel de Informações Lateral (se for aba de itens)
