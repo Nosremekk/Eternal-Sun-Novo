@@ -51,6 +51,7 @@ hitbox_y = 0;
 dir_atk = noone;
 desliza_hit = false;
 atacando_parede = false;
+duracao_inv = 1.25;
 
 // inputs 
 up = false;
@@ -671,18 +672,26 @@ function knockback()
     if (hurt_id != 0) //Tomei hit
     {
         //Verificando a posição horizontal de quem me atingiu
-        var dir = sign(x - hurt_id.x);
-        forca_knock = dir * max_velh * .75;
+        var _dir = sign(x - hurt_id.x);
         
+        // Segurança: Se estiverem no exato mesmo pixel, joga pra direita
+        if (_dir == 0) _dir = 1; 
+        
+        forca_knock = _dir * max_velh * 0.8;
         velh = forca_knock;
         
         hurt_id = 0;
     }    
-    else velh =  max_velh * .75;
+    else 
+    {
+        velh = max_velh * 0.8;
+    }
         
+    velv = -max_velv * 0.6; // Força para cima um pouquinho mais perceptível
     
-    velv = -max_velv/2;
-} 
+    // MAGIA: Desgruda o player do chão para o "movimento_vertical" não zerar a velocidade!
+    y -= 2; 
+}
 
 //Recupera vida e dispara alarme
 recupera_vida = function()
@@ -1055,8 +1064,11 @@ estado_dash.finaliza = function() {
     
     if (global.powerups[powerup.DASH_FANTASMA])
     {
-        inv = false;
-        image_alpha = 1;
+        if (inv_timer <= 0) 
+        {
+            inv = false;
+            image_alpha = 1.0;
+        }
     }
     
     if (place_meeting(x, y, obj_colisor_sombrio))
@@ -1189,34 +1201,36 @@ estado_attack.finaliza = function()
 estado_hurt.inicia = function()
 {
     inv = true;
-    inv_timer = .25;
+    inv_timer = 0; 
+    timer_stun = 0.3; 
+    
     InputVibrateConstant(0.8, 0, 350);
     aplica_screenshake();
     aplica_hitstop();
     knockback();
-    cam.hurt = true;//Tomo dano e dou um efeito na camera
-    global.combo = 1;//Perdi minha sequencia
+    cam.hurt = true;
+    global.combo = 1;
     restart_powerups();
 }
+
 estado_hurt.roda = function()
 {
     checando_chao();
     movimento_vertical();
     
-    //Voltando a ser mortal
-    if (inv_timer >= duracao_inv)
+    // Desconta o tempo de paralisia
+    timer_stun -= desconta_timer();
+    
+    if (timer_stun <= 0)
     {
         if (global.vida_atual <= 0) troca_estado(estado_dead);
-            else troca_estado(estado_idle);
+        else troca_estado(estado_idle);
     }
-    
 }
 
 estado_hurt.finaliza = function()
 {
-    image_alpha = 1;
     cam.hurt = false;
-    inv_timer = 0;
 }
 
 //--Dead

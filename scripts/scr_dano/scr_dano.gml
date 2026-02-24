@@ -21,7 +21,7 @@ function aplica_dano(_dano = 1,_player = true)
         {
             var _outro = _lista[|i];
             //Se o outro estiver invencivel, saio
-            if (_outro.inv) exit;
+            if (_outro.inv) continue;
             //Foi o player que criou o dano?
             if (_player)
             {//Dano em todos menos o player

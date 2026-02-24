@@ -43,20 +43,33 @@ init_dano();
 //Método para piscar
 blink = function()
 {
-    if (inv)
+    // Verifica se sou o Player e estou no meio do Dash Fantasma
+    var _eh_dash_fantasma = false;
+    if (object_index == obj_player)
     {
-        //Aumentando o  valor do inv timer
+        if (estado_atual == estado_dash and global.powerups[powerup.DASH_FANTASMA])
+        {
+            _eh_dash_fantasma = true;
+        }
+    }
+
+    // Só roda o relógio de tomar dano se NÃO for o Dash Fantasma
+    if (inv and !_eh_dash_fantasma)
+    {
+        // Aumentando o valor do inv timer
         inv_timer += desconta_timer();
         
+        // --- SUA MATEMÁTICA ORIGINAL PARA O SHADER ---
         var _sin = sin(inv_timer/5);
         _sin = (_sin + 1)/2;
         
         image_alpha = abs(_sin);
         
-        
+        // Fim da invencibilidade de DANO
         if (inv_timer >= duracao_inv)
         {
-            inv = false;        
+            inv = false;
+            inv_timer = 0; // Fundamental zerar aqui para não bugar o próximo dano/dash
             image_alpha = 1;
         }
     }
