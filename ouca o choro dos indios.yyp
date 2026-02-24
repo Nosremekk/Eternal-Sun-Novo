@@ -130,6 +130,7 @@
     {"id":{"name":"obj_cam","path":"objects/obj_cam/obj_cam.yy",},},
     {"id":{"name":"obj_cenario_interativo","path":"objects/obj_cenario_interativo/obj_cenario_interativo.yy",},},
     {"id":{"name":"obj_colisor_fino","path":"objects/obj_colisor_fino/obj_colisor_fino.yy",},},
+    {"id":{"name":"obj_colisor_sombrio","path":"objects/obj_colisor_sombrio/obj_colisor_sombrio.yy",},},
     {"id":{"name":"obj_colisor","path":"objects/obj_colisor/obj_colisor.yy",},},
     {"id":{"name":"obj_controla_luz","path":"objects/obj_controla_luz/obj_controla_luz.yy",},},
     {"id":{"name":"obj_controla_musica","path":"objects/obj_controla_musica/obj_controla_musica.yy",},},

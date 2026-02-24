@@ -248,7 +248,13 @@ colisao = function()
     var _velh_final = velh * global.vel_scale;
     var _velv_final = velv * global.vel_scale;
 
-
+    var _ignorando_sombrio = (estado_atual == estado_dash) and (global.powerups[powerup.DASH_FANTASMA]);
+    
+    if (_ignorando_sombrio) 
+    {
+        instance_deactivate_object(obj_colisor_sombrio);
+    }
+    
    if (place_meeting(x + _velh_final, y, colisor)) 
    {
        while (!place_meeting(x + sign(_velh_final), y, colisor)) 
@@ -271,6 +277,12 @@ colisao = function()
        velv = 0;
    }
    y += _velv_final;
+    
+    
+    if (_ignorando_sombrio) 
+    {
+        instance_activate_object(obj_colisor_sombrio);
+    }
 }
 
 //Plataforma fina
@@ -943,8 +955,6 @@ estado_dash.inicia = function()
     image_index  = 0;
     
 
-    
-
     if (dir == 90 or dir == 270) desconta_dura_dash = dura_dash * 0.7;
     else desconta_dura_dash = dura_dash;
     
@@ -953,6 +963,15 @@ estado_dash.inicia = function()
     InputVibrateConstant(0.3, 0.0, 150)
     cria_particula(x, y - (sprite_height / 2), TIPO_PARTICULA.POEIRA_DASH, 5)
     efeito_sonoro(sfx_dash, 50, 0.05)
+    
+    if (global.powerups[powerup.DASH_FANTASMA])
+    {
+        inv = true;
+        image_alpha = 0.5;
+    }
+    
+    dash_extensao_atual = 0;
+    dash_extensao_maxima = 8;
 }
 
 estado_dash.roda = function() 
@@ -982,12 +1001,34 @@ estado_dash.roda = function()
     atualiza_safe_ground();
     //Descontando timer de dash
     desconta_dura_dash -= desconta_timer();
+    
+    
     if (desconta_dura_dash <= 0) 
     {
-        // termina em estado aéreo ou chão
-        if (chao) troca_estado( (abs(velh) > 0.1) ? estado_walk : estado_idle );
-        else      troca_estado(estado_jump);
-        exit;
+        // Se a duração normal acabou, mas estou com o powerup e dentro do colisor sombrio...
+        if (global.powerups[powerup.DASH_FANTASMA] and place_meeting(x, y, obj_colisor_sombrio))
+        {
+            // Tento prolongar o dash!
+            if (dash_extensao_atual < dash_extensao_maxima)
+            {
+                desconta_dura_dash = desconta_timer(); // Dá mais 1 frame de vida
+                dash_extensao_atual++;
+            }
+            else
+            {
+                // Limite estourou! Parede grossa demais. Vai pro finaliza para tomar o kickback.
+                if (chao) troca_estado( (abs(velh) > 0.1) ? estado_walk : estado_idle );
+                else      troca_estado(estado_jump);
+                exit;
+            }
+        }
+        else
+        {
+            // Fim normal do dash
+            if (chao) troca_estado( (abs(velh) > 0.1) ? estado_walk : estado_idle );
+            else      troca_estado(estado_jump);
+            exit;
+        }
     }
     
     if (current_time % 4 == 0) // Truque simples de timer
@@ -999,6 +1040,11 @@ estado_dash.roda = function()
         _rastro.image_yscale = image_yscale;
     }
     
+    if (global.powerups[powerup.DASH_FANTASMA])
+    {
+        inv = true;
+        image_alpha = 0.5;
+    }
     
 };
 
@@ -1006,6 +1052,27 @@ estado_dash.finaliza = function() {
     // reduz suavemente a velocidade ao sair do dash
     velh = max_velh * sign(velh) * .5;
     velv = max_velv * sign(velv) * 0.5;
+    
+    if (global.powerups[powerup.DASH_FANTASMA])
+    {
+        inv = false;
+        image_alpha = 1;
+    }
+    
+    if (place_meeting(x, y, obj_colisor_sombrio))
+    {
+        var _oposto = dir + 180;
+        var _dx = lengthdir_x(1, _oposto);
+        var _dy = lengthdir_y(1, _oposto);
+        
+        var _seguranca = 500; 
+        while (place_meeting(x, y, obj_colisor_sombrio) and _seguranca > 0)
+        {
+            x += sign(_dx); // O sign garante que ele se mova de pixel em pixel
+            y += sign(_dy);
+            _seguranca--;
+        }
+    }
 }
 
 
