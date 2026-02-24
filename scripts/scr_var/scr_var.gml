@@ -156,10 +156,12 @@ enum powerup
     DOUBLE_J,
     COMBO,
     FLOAT,
-    MARK
+    MARK,
+    DASH_CELESTE,
+    DASH_FANTASMA
 }
 
-global.powerups = [false, false, 0,false,false,false];
+global.powerups = [false, false, 0,false,false,false,false,false];
 global.max_carga = 1;
 
 //Tiro
@@ -172,7 +174,9 @@ global.marca_pos_y = 0;
 // Restaura estado físico (pulo/dash)
 function restart_powerups()
 {
-    obj_player.carga = global.max_carga;
+    var _carga_extra = global.powerups[powerup.DASH_CELESTE] ? 1 : 0;
+    
+    obj_player.carga = global.max_carga + _carga_extra;
     obj_player.jump_extra_left = global.powerups[powerup.DOUBLE_J];
 }
 
@@ -203,7 +207,7 @@ function reset_variaveis_jogo()
     }
 
     //Resetando variaveis
-    global.powerups = [false, false, 0,false,false,false];
+    global.powerups = [false, false, 0,false,false,false,false,false];
     global.max_carga = 1;
     
     // --- RESET DE STATS GLOBAIS ---

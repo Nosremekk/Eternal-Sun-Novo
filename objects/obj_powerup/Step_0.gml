@@ -18,4 +18,8 @@ switch(lista_powerup) //Me destruindo caso ja tenha o powerup
         
     case "tiro":    if (global.powerups[powerup.MARK] == true) instance_destroy(); break;
     
+    case "celeste":    if (global.powerups[powerup.DASH_CELESTE] == true) instance_destroy(); break;
+        
+    case "fantasma":    if (global.powerups[powerup.DASH_FANTASMA] == true) instance_destroy(); break;            
+    
 }

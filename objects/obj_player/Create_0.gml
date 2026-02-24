@@ -151,10 +151,21 @@ checando_paredes = function()
 
 direcao_dash = function() 
 {
-    if (right) return 0;
-    if (left)  return 180;
-
-    return (xscale >= 0) ? 0 : 180;
+    if (global.powerups[powerup.DASH_CELESTE])
+    {
+        var _hor = right - left;
+        var _ver = down - up;
+        
+        if (_hor == 0 and _ver == 0) return (xscale >= 0) ? 0 : 180;
+        
+        return point_direction(0, 0, _hor, _ver);
+    }
+    else
+    {
+        if (right) return 0;
+        if (left)  return 180;
+        return (xscale >= 0) ? 0 : 180;
+    }
 }
 
 // Aceleração horizontal
@@ -930,9 +941,13 @@ estado_dash.inicia = function()
 {
     sprite = spr_player_dash;
     image_index  = 0;
-    var _dx = (dir == 180) ? -1 : 1;
-    velh = _dx * len;
-    velv = 0;
+    
+
+    
+
+    if (dir == 90 or dir == 270) desconta_dura_dash = dura_dash * 0.7;
+    else desconta_dura_dash = dura_dash;
+    
     carga--;
     desconta_dura_dash = dura_dash; 
     InputVibrateConstant(0.3, 0.0, 150)
@@ -942,6 +957,9 @@ estado_dash.inicia = function()
 
 estado_dash.roda = function() 
 {
+    velh = lengthdir_x(len, dir);
+    velv = lengthdir_y(len, dir);
+    
     //Saindo do estado pulando
     if (jump) and (chao or timer_pulo > 0)
     {
@@ -987,6 +1005,7 @@ estado_dash.roda = function()
 estado_dash.finaliza = function() {
     // reduz suavemente a velocidade ao sair do dash
     velh = max_velh * sign(velh) * .5;
+    velv = max_velv * sign(velv) * 0.5;
 }
 
 

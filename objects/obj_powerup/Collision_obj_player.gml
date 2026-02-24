@@ -12,6 +12,8 @@ switch(lista_powerup)
     case "combo" : global.powerups[powerup.COMBO] = true; break;
     case "float" : global.powerups[powerup.FLOAT] = true; break;
     case "tiro" : global.powerups[powerup.MARK] = true; break;
+    case "celeste" : global.powerups[powerup.DASH_CELESTE] = true; break;
+    case "fantasma" : global.powerups[powerup.DASH_FANTASMA] = true; break;
     
 }
 
