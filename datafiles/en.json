@@ -52,9 +52,11 @@
     "opt_teclado_dash": "Dash:",
     "opt_teclado_gancho": "Special Attack:",
     "opt_teclado_inventario": "Inventory:",
+    "opt_teclado_magia": "Magic:",
     "opt_teclado_resetar": "Reset to Default",
     "opt_controle_pular": "Jump:",
     "opt_controle_atacar": "Attack:",
+    "opt_controle_magia": "Magic:",
     "opt_controle_vibrar": "Vibration:",
     "opt_resetar_padrao": "Reset to Default",
     "msg_erro_dispositivo": "Use the correct device to edit!",
@@ -120,5 +122,5 @@
     "hab_combo": "Combo Master",
     "hab_float": "Float",
     "hab_mark": "Spectral Mark",
-    "ui_bestiario_get": "RESEARCH COMPLETE",
+    "ui_bestiario_get": "RESEARCH COMPLETE"
 }

@@ -50,25 +50,24 @@ menu[MENU_TIPO.EXIT_CONFIRM]   = ["menu_nao", "menu_sim"];
 menu[MENU_TIPO.JOGO]           = ["opt_idioma", "menu_voltar"];
 menu[MENU_TIPO.SOM]            = ["opt_volume_mestre", "opt_volume_musica", "opt_volume_sfx", "opt_mute_foco", "menu_voltar"];
 menu[MENU_TIPO.VIDEO]          = ["opt_modo_janela", "opt_resolucao", "opt_vsync", "opt_screenshake", "opt_ui_scale", "menu_voltar"];
-menu[MENU_TIPO.OPCOES]         = []; 
+menu[MENU_TIPO.OPCOES]         = [];
 
-// Menu Teclado
+// --- MODIFICADO: Menu Teclado (Inserido "opt_teclado_magia") ---
 menu[MENU_TIPO.TECLADO] = [
     "opt_teclado_cima", "opt_teclado_baixo", "opt_teclado_esquerda", "opt_teclado_direita",
     "opt_teclado_pular", "opt_teclado_atacar", "opt_teclado_dash", "opt_teclado_gancho", "opt_teclado_inventario", 
-    "opt_teclado_resetar", "menu_voltar"
+    "opt_teclado_magia", "opt_teclado_resetar", "menu_voltar"
 ];
 
-// Menu Controle
+// --- MODIFICADO: Menu Controle (Inserido "opt_controle_magia") ---
 menu[MENU_TIPO.CONTROLE] = [
     "opt_controle_pular", "opt_controle_atacar", "opt_teclado_dash", "opt_teclado_gancho", "opt_teclado_inventario", 
-    "opt_controle_vibrar", "opt_resetar_padrao", "menu_voltar"
+    "opt_controle_magia", "opt_controle_vibrar", "opt_resetar_padrao", "menu_voltar"
 ];
 
 // Sistema
 slot_selecionado = -1;
 
-// --- FUNÇÃO DE LEITURA SEGURA (ADICIONADA AQUI PARA EVITAR CRASH) ---
 ler_dados_save_simples = function(_idx)
 {
     var _arquivo = "Save0" + string(_idx+1) + ".json";
@@ -78,53 +77,43 @@ ler_dados_save_simples = function(_idx)
         var _file = file_text_open_read(_arquivo);
         var _conteudo = "";
 
-        // --- CORREÇÃO: Ler todo o arquivo, não apenas a primeira linha ---
         while (!file_text_eof(_file)) {
             _conteudo += file_text_readln(_file);
         }
         file_text_close(_file);
         
-        // 1. Tenta Ler como Base64 (Saves Novos)
         try {
             var _json_str = base64_decode(_conteudo);
-            // Verifica se decodificou algo válido (começa com '{')
             if (string_char_at(_json_str, 1) == "{") {
                 return json_parse(_json_str);
             }
-            // Se não parece JSON, força erro para cair no catch
             throw("Formato inválido");
         } 
         catch(e) {
-            // 2. Tenta Ler como Texto Puro (Saves Antigos/Legado)
             return json_parse(_conteudo);
         }
     } catch(e) {
-        return undefined; // Arquivo corrompido ou ilegível
+        return undefined;
     }
 }
 
-// --- CACHE DE INFO DOS SAVES ---
-slots_info = array_create(5, undefined); 
-
-// Função Helper para carregar cache
+slots_info = array_create(5, undefined);
 carregar_cache_saves = function() {
     for (var i = 0; i < 5; i++) {
-        var _dados = ler_dados_save_simples(i); // Agora chama a função local definida acima
+        var _dados = ler_dados_save_simples(i);
         
         if (is_struct(_dados) and variable_struct_exists(_dados, "info")) {
             slots_info[i] = _dados.info;
         } 
         else if (is_struct(_dados)) {
-            // Save antigo (sem metadados, mas existe)
             slots_info[i] = { area_atual: "???", tempo_formatado: "--:--", porcentagem: 0, data_save: "" };
         }
         else {
-            // Vazio ou erro
             slots_info[i] = undefined;
         }
     }
 }
-carregar_cache_saves(); // Chama ao iniciar
+carregar_cache_saves(); 
 
 mudar_menu = function(_novo_menu)
 {
@@ -150,7 +139,7 @@ voltar_menu = function()
     {
         if (is_pause_mode)
         {
-            global.pause = false; 
+            global.pause = false;
             salvar_config(); 
             salvar_config_ui();
             InputVerbConsumeAll();
@@ -180,30 +169,28 @@ voltar_menu = function()
 rebinding_mode = false; 
 verbo_em_edicao = undefined;
 rebind_device = undefined; 
-rebind_is_gamepad = false; 
+rebind_is_gamepad = false;
 msg_erro_timer = 0; 
 
+// --- MODIFICADO: Mapas de rebind (Adicionado INPUT_VERB.MAGIC no índice 9 e 5 respectivamente) ---
 mapa_rebind_teclado = [
     INPUT_VERB.UP, INPUT_VERB.DOWN, INPUT_VERB.LEFT, INPUT_VERB.RIGHT,
     INPUT_VERB.JUMP, INPUT_VERB.ATTACK, INPUT_VERB.DASH, INPUT_VERB.HOOK, INPUT_VERB.OPEN_INVENTORY,
-    -1, -1
+    INPUT_VERB.MAGIC, -1, -1 
 ];
 
 mapa_rebind_controle = [
     INPUT_VERB.JUMP, INPUT_VERB.ATTACK, INPUT_VERB.DASH, INPUT_VERB.HOOK, INPUT_VERB.OPEN_INVENTORY, 
-    -1, -1, -1
+    INPUT_VERB.MAGIC, -1, -1, -1 
 ];
 
 // Sistema de Notificação (Toast)
 notificacao_texto = "";
 notificacao_timer = 0; 
-notificacao_cor   = c_lime; 
-
-// --- FUNÇÕES DE DESENHO (Organização do Draw GUI) ---
+notificacao_cor   = c_lime;
 
 desenha_tooltip = function(_gui_w, _gui_h, _chave_desc) {
     if (_chave_desc == "" or !variable_struct_exists(global.text, _chave_desc)) return;
-    
     var _s = 1.0; 
     var _texto_desc = global.text[$ _chave_desc];
     
@@ -224,14 +211,11 @@ desenha_tooltip = function(_gui_w, _gui_h, _chave_desc) {
     draw_text_transformed(_cx + 2, _desc_y + 2, _texto_desc, _desc_scale, _desc_scale, 0);
     draw_set_color(c_ltgray); draw_set_alpha(0.9);      
     draw_text_transformed(_cx, _desc_y, _texto_desc, _desc_scale, _desc_scale, 0);
-    
-    // Reset
     draw_set_alpha(1); draw_set_color(c_white);
 }
 
 desenha_notificacao = function(_gui_w, _gui_h) {
     if (notificacao_timer <= 0) return;
-    
     var _s = 1.0;
     draw_set_font(fnt_dialogo);
     
@@ -244,13 +228,13 @@ desenha_notificacao = function(_gui_w, _gui_h) {
         var _progresso = (_timer_max - notificacao_timer) / 0.5;
         var _ease = sin(_progresso * pi / 2); 
         _alpha_notif = _ease; 
-        _y_offset_anim = 30 * (1 - _ease); 
+        _y_offset_anim = 30 * (1 - _ease);
     } else if (notificacao_timer < 0.5) {
         _alpha_notif = notificacao_timer / 0.5;
     }
     
     var _margin_right = 10 * _s;     
-    var _margin_bottom = 40 * _s;    
+    var _margin_bottom = 40 * _s;
     var _pad_x = 15 * _s;
     var _pad_y = 8 * _s;
     
@@ -258,33 +242,35 @@ desenha_notificacao = function(_gui_w, _gui_h) {
     var _txt_h = string_height(notificacao_texto);
     var _box_w = _txt_w + (_pad_x * 2) + 8;
     var _box_h = _txt_h + (_pad_y * 2);
-    
     var _x2 = _gui_w - _margin_right;
     var _x1 = _x2 - _box_w;
     var _y2 = (_gui_h - _margin_bottom) + _y_offset_anim;
     var _y1 = _y2 - _box_h;
     
     // Fundo Vidro
-    draw_set_alpha(0.7 * _alpha_notif); draw_set_color(c_dkgray); 
+    draw_set_alpha(0.7 * _alpha_notif); draw_set_color(c_dkgray);
     draw_roundrect_ext(_x1, _y1, _x2, _y2, 8, 8, false);
     
     // Borda Glow
-    draw_set_alpha(_alpha_notif); draw_set_color(notificacao_cor); 
+    draw_set_alpha(_alpha_notif); draw_set_color(notificacao_cor);
     draw_roundrect_ext(_x1, _y1, _x2, _y2, 8, 8, true);
     draw_roundrect_ext(_x1+1, _y1+1, _x2-1, _y2-1, 8, 8, true);
 
     // Texto
-    draw_set_halign(fa_right); draw_set_valign(fa_middle);
+    draw_set_halign(fa_right);
+    draw_set_valign(fa_middle);
     var _texto_x = _x2 - (15 * _s); 
     var _texto_y = _y1 + (_box_h / 2);
     
-    draw_set_alpha(0.8 * _alpha_notif); draw_set_color(c_black);
+    draw_set_alpha(0.8 * _alpha_notif);
+    draw_set_color(c_black);
     draw_text_transformed(_texto_x + 2, _texto_y + 2, notificacao_texto, _s, _s, 0);
     
     draw_set_alpha(_alpha_notif); draw_set_color(c_white);
     draw_text_transformed(_texto_x, _texto_y, notificacao_texto, _s, _s, 0);
     
-    draw_set_alpha(1); draw_set_color(c_white); draw_set_halign(-1); draw_set_valign(-1);
+    draw_set_alpha(1);
+    draw_set_color(c_white); draw_set_halign(-1); draw_set_valign(-1);
 }
 
 InputVerbConsumeAll();

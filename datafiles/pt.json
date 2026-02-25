@@ -52,9 +52,11 @@
     "opt_teclado_dash": "Dash:",
     "opt_teclado_gancho": "Ataque Especial:",
     "opt_teclado_inventario": "Inventário:",
+    "opt_teclado_magia": "Magia:",
     "opt_teclado_resetar": "Redefinir Padrão",
     "opt_controle_pular": "Pular:",
     "opt_controle_atacar": "Atacar:",
+    "opt_controle_magia": "Magia:",
     "opt_controle_vibrar": "Vibração:",
     "opt_resetar_padrao": "Redefinir Padrão",
     "msg_erro_dispositivo": "Use o dispositivo correto para editar!",
@@ -120,5 +122,5 @@
     "hab_combo": "Mestre do Combo",
     "hab_float": "Flutuar",
     "hab_mark": "Marca Espectral",
-    "ui_bestiario_get": "PESQUISA CONCLUÍDA",
+    "ui_bestiario_get": "PESQUISA CONCLUÍDA"
 }
