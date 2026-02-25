@@ -106,13 +106,17 @@ estado_fadeout.roda = function()
     
     escala_pulse = lerp(escala_pulse, 1.15, 0.005 * velocidade_mult); 
     
-    if (alpha <= 0)
+    if (alpha <= 0) 
     {
         alpha = 0;
-        audio_stop_sound(snd_test); // Corta o som se acelerou
         
-        IniciarTransicao(proxima_sala);
-        troca_estado(estado_fim); 
+        // SÓ avança de estado se a transição mestre REALMENTE iniciar!
+        // Se ela retornar false (ocupada), ele tenta de novo no próximo frame.
+        if (IniciarTransicao(proxima_sala))
+        {
+            audio_stop_sound(snd_test); // Corta o som
+            troca_estado(estado_fim); 
+        }
     }
 }
 

@@ -15,13 +15,8 @@ if (global.dados_load_pendente != undefined) and (instance_exists(obj_player))
         obj_cam.y = obj_player.y;
     }
 
-    // 2. RESET E CARREGAMENTO DE BASES (Nas Globais)
-    // Recuperamos o quanto o player tinha de base (sem amuletos) no momento do save
-    global.vida_base = _dados.player.vida_max; 
+
     global.velh_base = _dados.player.velh_base;
-    
-    // Reseta os calculados para o base antes de processar equipamentos
-    global.vida_max       = global.vida_base;
     global.velh_calculada = global.velh_base;
 
     // Globais

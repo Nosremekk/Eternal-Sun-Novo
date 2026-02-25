@@ -14,9 +14,14 @@ global.slow_motion = false;
 
 global.tempo_de_jogo_segundos = 0;
 // Vida
-global.vida_base  = 5;  
-global.vida_max   = 5; 
-global.vida_atual = 5;  
+global.vida_base = 5;                  // O quanto o player nasce no início do jogo (imutável)
+global.fragmentos_vida = 0;            // Quantos pedaços ele tem no inventário
+global.fragmentos_por_ponto = 4;       // Quantos precisa para ganhar 1 de vida
+global.vida_permanente_memoria = 5;    // Usado para saber quando tocar o "som do Zelda"
+global.vida_max = 5;                   // Vida máxima final (Base + Fragmentos + Amuletos)
+global.vida_atual = 5;                 // Vida que o player tem agora
+
+
 // Velocidade
 global.velh_base      = 5; // Velocidade padrão
 global.velh_calculada = 5; // Velocidade final (base + amuletos)
@@ -33,6 +38,7 @@ global.timer_combo = 10; // Segundos
 
 //Outros
 global.permanentemente_quebrado = {};
+global.itens_coletados = {};
 global.respawn_anim = false;
 
 //Ui
@@ -41,12 +47,32 @@ global.respawn_anim = false;
 // Recalculo de stats
 function atualiza_stats_player()
 {
-    //Reseta
-    global.vida_max       = global.vida_base;
+    // --------------------------------------------------------
+    // 1. CALCULA A NOVA VIDA PERMANENTE (Base + Fragmentos)
+    // --------------------------------------------------------
+    var _bonus_fragmentos = floor(global.fragmentos_vida / global.fragmentos_por_ponto);
+    var _nova_vida_permanente = global.vida_base + _bonus_fragmentos;
+    
+    // Se a vida permanente AUMENTOU (o player completou 4 fragmentos agora)
+    if (_nova_vida_permanente > global.vida_permanente_memoria) 
+    {
+        global.vida_atual = _nova_vida_permanente; // Cura o player
+        // TODO: Tocar Efeito Sonoro de "Zelda Heart Container"
+    }
+    
+    // Salva na memória para a próxima checagem
+    global.vida_permanente_memoria = _nova_vida_permanente;
+
+    // --------------------------------------------------------
+    // 2. PREPARA OS STATS PARA RECEBER OS AMULETOS
+    // --------------------------------------------------------
+    global.vida_max       = _nova_vida_permanente; // A vida máxima começa com a permanente
     global.velh_calculada = global.velh_base;
     global.dano           = global.dano_base;
     
-    // Percorre amuletos equipados e soma os buffs
+    // --------------------------------------------------------
+    // 3. APLICA OS AMULETOS (Bônus Temporários)
+    // --------------------------------------------------------
     if (variable_global_exists("amuletos_equipados") and ds_exists(global.amuletos_equipados, ds_type_list))
     {
         var _tam = ds_list_size(global.amuletos_equipados);
@@ -54,7 +80,6 @@ function atualiza_stats_player()
         {
             var _amuleto = global.amuletos_equipados[| i];
             
-            // Verifica se é um struct válido e aplica na GLOBAL
             if (is_struct(_amuleto))
             {
                 switch (_amuleto.tipo_efeito)
@@ -67,18 +92,19 @@ function atualiza_stats_player()
         }
     }
     
-    // Segurança
-    // Se eu tirei um amuleto de vida e minha vida atual está maior que a nova máxima, corta o excesso.
-    if (global.vida_atual > global.vida_max) global.vida_atual = global.vida_max;
+    // --------------------------------------------------------
+    // 4. REGRAS DE SEGURANÇA E SINCRONIZAÇÃO
+    // --------------------------------------------------------
+    // Impede que a vida atual fique maior que a vida máxima (ex: tirou amuleto de vida)
+    global.vida_atual = clamp(global.vida_atual, 0, global.vida_max);
     
-    // Sincroniza com o Player (se ele existir na sala)
-    // O Player vai usar as globais de vida direto, mas a velocidade costuma ser local para física
+    // Sincroniza a velocidade se o player estiver na sala
     if (instance_exists(obj_player))
     {
         obj_player.max_velh = global.velh_calculada;
     }
     
-    show_debug_message("Stats Recalculados | Vida: " + string(global.vida_max) + " | Vel: " + string(global.velh_calculada) + " | Dano: " + string(global.dano));
+    show_debug_message("Stats Atualizados | Vida Max: " + string(global.vida_max) + " | Vel: " + string(global.velh_calculada) + " | Dano: " + string(global.dano));
 }
 
 function adiciona_combo()
@@ -211,9 +237,12 @@ function reset_variaveis_jogo()
     global.max_carga = 1;
     
     // --- RESET DE STATS GLOBAIS ---
-    global.vida_base  = 5;
-    global.vida_max   = 5;
-    global.vida_atual = 5;
+    global.vida_base = 5;                 
+    global.fragmentos_vida = 0;           
+    global.fragmentos_por_ponto = 4;      
+    global.vida_permanente_memoria = 5;   
+    global.vida_max = 5;                  
+    global.vida_atual = 5;                
     
     global.velh_base      = 5;
     global.velh_calculada = 5;
@@ -245,6 +274,7 @@ function reset_variaveis_jogo()
     global.marca_pos_x = 0;
     global.marca_pos_y = 0;
     global.permanentemente_quebrado = {};
+    global.itens_coletados = {};
     global.eventos = 
     { 
     npcs: {}, 

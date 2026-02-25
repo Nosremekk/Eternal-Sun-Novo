@@ -5,7 +5,7 @@ if (mode != "idle")
     {
         alpha = clamp(alpha + fade_speed, 0, 1);
         
-        if (alpha == 1)
+        if (alpha >= 1)
         {
             mode = "trocar"; 
         }
@@ -28,7 +28,7 @@ if (mode != "idle")
     {
         alpha = clamp(alpha - fade_speed, 0, 1);
         
-        if (alpha == 0)
+        if (alpha <= 0)
         {
             mode = "idle"; 
             // Garante que o player está livre ao terminar a transição

@@ -104,7 +104,6 @@ function salvando_jogo(_save = global.save, _eh_checkpoint = false)
             
             // ATUALIZADO: Agora salva as globais corretas
             vida      : global.vida_atual, // Salva quanto de vida tem AGORA
-            vida_max  : global.vida_base,  // Salva a vida BASE (sem amuletos) para ser recalculada no load
             velh_base : global.velh_base,  // Salva a velocidade BASE
             
             powerups  : global.powerups
@@ -120,7 +119,11 @@ function salvando_jogo(_save = global.save, _eh_checkpoint = false)
         bestiario_kills  : global.bestiario_kills,
         bosses_mortos    : global.bosses_mortos,
         eventos_mundo    : global.eventos,
-        objetos          : global.permanentemente_quebrado
+        objetos          : global.permanentemente_quebrado,
+        
+        // --- NOVIDADE: DADOS DE ITENS E FRAGMENTOS ---
+        itens_coletados  : global.itens_coletados,
+        fragmentos_vida  : global.fragmentos_vida
     };
     
     // --- GRAVAÇÃO SEGURA COM ENCODE ---
@@ -206,8 +209,28 @@ function carrega_jogo(_save = global.save)
         // Se o save for antigo e não tiver, começa vazio
         global.bestiario_kills = {}; 
     }
+    
+    // --- NOVIDADE: CARREGANDO OS ITENS COLETADOS E FRAGMENTOS ---
+    if (variable_struct_exists(global.dados_load_pendente, "itens_coletados"))
+    {
+        global.itens_coletados = global.dados_load_pendente.itens_coletados;
+    }
+    else
+    {
+        global.itens_coletados = {}; 
+    }
+    
+    if (variable_struct_exists(global.dados_load_pendente, "fragmentos_vida"))
+    {
+        global.fragmentos_vida = global.dados_load_pendente.fragmentos_vida;
+    }
+    else
+    {
+        global.fragmentos_vida = 0; 
+    }
 
     global.inimigos_mortos_temp = {}; 
+
     
     // Transição
     var _room_dest = asset_get_index(global.respawn_room);

@@ -358,3 +358,8 @@ function get_permanentemente_quebrados_key()
 {
     return room_get_name(room) + "_" + string(xstart) + "_" + string(ystart)
 }
+
+function get_item_coletado_key() 
+{
+    return room_get_name(room) + "_" + object_get_name(object_index) + "_" + string(x) + "_" + string(y);
+}

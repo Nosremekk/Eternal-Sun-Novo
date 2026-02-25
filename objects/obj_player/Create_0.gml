@@ -852,10 +852,10 @@ estado_walk.roda = function()
             passo_sfx= floor(image_index);
         }
     }
-else
-{
-    variavel_controle_passo = -1;
-}    
+    else
+    {
+        variavel_controle_passo = -1;
+    }    
     
 }
 
