@@ -1,3 +1,5 @@
+if (other.inv) exit;
+
 // Colisão com Player
 if (other.vida_atual > 0)
 {

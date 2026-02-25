@@ -37,39 +37,25 @@ function ajusta_xscale()
 }
 
 //Chao
-function checando_chao()
+function checando_chao() 
 {
-    // 1. Chão Sólido
-    var _chao_solido = place_meeting(x, y + 1, obj_colisor);
-
-    // 2. Chão One-Way (Plataforma Fina)
-    var _chao_oneway = false;
-    var _inst_oneway = instance_place(x, y + 1, obj_colisor_fino);
+    var _chao_solido = place_meeting(x, y + 1, colisor);
+    var _chao_fino = false;
     
-    if (_inst_oneway != noone)
+    // Só verifica a plataforma se estiver caindo ou parado (nunca subindo)
+    if (velv >= 0)
     {
-        // A única condição para "SER CHÃO" é estar fisicamente em cima.
-        // Não importa se eu quero descer ou não. Se estou em cima, é chão.
-        var _estou_em_cima = (bbox_bottom <= _inst_oneway.bbox_top + 2); 
-        
-        if (_estou_em_cima)
+        var _oneway = instance_place(x, y + 1, obj_colisor_fino);
+        if (_oneway != noone)
         {
-            _chao_oneway = true;
-            
-            // Opcional: Snap suave (mantenha se estiver gostando, se tremer, tire)
-            // Mas cuidado: mexer no Y aqui pode brigar com o movimento_vertical
-            if (!place_meeting(x, y, obj_colisor_fino))
+            if (round(bbox_bottom) <= round(_oneway.bbox_top))
             {
-                 // y = _inst_oneway.bbox_top - (bbox_bottom - y); 
-                 // Sugestão: Comente essa linha de snap por enquanto para testar
+                _chao_fino = true;
             }
         }
     }
-
-    chao = (_chao_solido || _chao_oneway);
     
-   
-    
+    chao = _chao_solido or _chao_fino;
 }
 
 function checando_chao_geral()   

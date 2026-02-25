@@ -41,6 +41,7 @@ dir   = 0;
 parede_dir   = false;
 parede_esq   = false;
 limite_parede = 6;
+timer_parede = 0;
 ultima_parede = 0;   // 0=dir, 1=esq
 deslize       = 2;  
 
@@ -146,8 +147,24 @@ controles = function() {
 
 checando_paredes = function() 
 {
-    parede_dir = place_meeting(x + 1, y, colisor);
-    parede_esq = place_meeting(x - 1, y, colisor);
+    var _inst_dir = instance_place(x + 1, y, colisor);
+    var _inst_esq = instance_place(x - 1, y, colisor);
+    
+    parede_dir = (_inst_dir != noone) and (_inst_dir.object_index != obj_plataforma_movel);
+    parede_esq = (_inst_esq != noone) and (_inst_esq.object_index != obj_plataforma_movel);
+
+    // --- COYOTE TIME DA PAREDE ---
+    if (parede_dir or parede_esq) 
+    {
+        // Se estou colado, o relógio reseta e lembro de que lado era
+        timer_parede = limite_parede;
+        ultima_parede = parede_dir ? 0 : 1; // 0 = dir, 1 = esq
+    } 
+    else 
+    {
+        // Se desgrudei, o relógio começa a contagem regressiva
+        if (timer_parede > 0) timer_parede--;
+    }
 }
 
 direcao_dash = function() 
@@ -200,24 +217,28 @@ movimento_vertical = function()
     if (chao) velv = 0;
     var _quer_descer = (down and jump); 
     
-    // Agora "chao" é TRUE, então entra aqui!
-    if (_quer_descer) and (chao)
+    // --- DESCER DA PLATAFORMA FINA ---
+    if (_quer_descer)
     {
         var _plataforma = instance_place(x, y + 1, obj_colisor_fino);
-        if (_plataforma != noone) 
+        var _chao_solido = place_meeting(x, y + 1, colisor); 
+        
+        // Se tem plataforma fina, mas NÃO tem chão de pedra junto...
+        if (_plataforma != noone and !_chao_solido) 
         {
-            velv = 1;   
-            
+            velv = 1;
             timer_pulo = 0; 
             timer_queda = 0; 
             chao = false; 
             
-            return; // Sai da função, impedindo o pulo
+            y += 2; // O SEGREDO: Força o pé do player a atravessar a plataforma fina fisicamente!
+            return; // Encerra a função AQUI. Sem risco do jogo tentar dar um pulo normal!
         }
     }
     
     // Coyote
-    if (chao) timer_pulo = limite_pulo; else if (timer_pulo > 0) timer_pulo--;
+    if (chao) timer_pulo = limite_pulo;
+    else if (timer_pulo > 0) timer_pulo--;
 
     // Buffer
     if (jump) timer_queda = limite_buffer;
@@ -225,6 +246,13 @@ movimento_vertical = function()
     // Executa pulo se puder
     if (timer_queda > 0 and (chao or timer_pulo > 0)) {
         velv = -max_velv;
+        
+        var _plat = instance_place(x, y + 2, obj_plataforma_movel);
+        if (_plat != noone and _plat.vsp < 0) 
+        {
+            velv += _plat.vsp; 
+        }
+        
         timer_pulo  = 0;
         timer_queda = 0;
         cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 5)
@@ -243,84 +271,85 @@ movimento_vertical = function()
     // Consome buffer gradualmente
     if (timer_queda > 0) timer_queda--;
 };
-//Colisao manual
+// Colisao integrada
 colisao = function()
 {
     var _velh_final = velh * global.vel_scale;
     var _velv_final = velv * global.vel_scale;
 
     var _ignorando_sombrio = (estado_atual == estado_dash) and (global.powerups[powerup.DASH_FANTASMA]);
-    
-    if (_ignorando_sombrio) 
+    if (_ignorando_sombrio) instance_deactivate_object(obj_colisor_sombrio);
+
+    // --- HORIZONTAL ---
+    if (place_meeting(x + _velh_final, y, colisor)) 
     {
-        instance_deactivate_object(obj_colisor_sombrio);
-    }
-    
-   if (place_meeting(x + _velh_final, y, colisor)) 
-   {
        while (!place_meeting(x + sign(_velh_final), y, colisor)) 
        {
            x += sign(_velh_final);
        }
        _velh_final = 0;
        velh = 0;
-   }
-   x += _velh_final;
-   
-   
-   if (place_meeting(x, y + _velv_final, colisor)) 
-   {
+    }
+    x += _velh_final;
+    
+    // --- VERTICAL ---
+    var _bateu_chao = false;
+    var _dir_y = sign(_velv_final);
+
+    // 1. Parede Sólida
+    if (place_meeting(x, y + _velv_final, colisor)) 
+    {
        while (!place_meeting(x, y + sign(_velv_final), colisor)) 
        {
            y += sign(_velv_final);
        }
        _velv_final = 0;
        velv = 0;
-   }
-   y += _velv_final;
+       if (_dir_y > 0) _bateu_chao = true; 
+    }
     
-    
-    if (_ignorando_sombrio) 
+    // 2. Plataforma Fina (One-Way)
+    if (!_bateu_chao and _velv_final > 0) 
     {
-        instance_activate_object(obj_colisor_sombrio);
+        var _oneway = instance_place(x, y + _velv_final, obj_colisor_fino);
+        if (_oneway != noone)
+        {
+            // Se o pé antes da queda estava ACIMA do topo, ele colide.
+            // (Como a descida te forçou Y+2, isso aqui vira Falso e ele cai normal!)
+            if (round(bbox_bottom) <= round(_oneway.bbox_top))
+            {
+                while (!place_meeting(x, y + sign(_velv_final), _oneway)) 
+                {
+                    y += sign(_velv_final);
+                }
+                _velv_final = 0;
+                velv = 0;
+                _bateu_chao = true;
+            }
+        }
+    }
+    
+    y += _velv_final;
+
+    // --- REATIVA FANTASMA E POUSO ---
+    if (_ignorando_sombrio) instance_activate_object(obj_colisor_sombrio);
+    
+    if (_bateu_chao)
+    {
+        if (!chao)
+        {
+            restart_powerups(); 
+            if (estado_atual == estado_jump or estado_atual == estado_float)
+            {
+                 cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 3);
+                 if (abs(velh) > 0.1) troca_estado(estado_walk);
+                 else troca_estado(estado_idle);
+            }
+        }
+        tempo_queda_livre = 0;
     }
 }
 
-//Plataforma fina
-plat_fina = function()
-{ 
-  var _oneway = instance_place(x, y + velv, obj_colisor_fino); 
-  var _comando_descer = (down && jump); 
-
-   if (_oneway != noone && velv > 0 && !_comando_descer) 
-   {
-       if (bbox_bottom <= _oneway.bbox_top) 
-       {
-           if (place_meeting(x, y + velv, obj_colisor_fino))
-           {
-               while (!place_meeting(x, y + sign(velv), obj_colisor_fino))
-               {
-                   y += sign(velv);
-               }
-           }
-           
-           // Zera velocidade vertical 
-           velv = 0;
-           chao = true; 
-           restart_powerups(); 
-           tempo_queda_livre = 0;
-           
-          
-           if (estado_atual == estado_jump or estado_atual == estado_float)
-           {
-                cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 3);
-                
-                if (abs(velh) > 0.1) troca_estado(estado_walk);
-                else troca_estado(estado_idle);
-           }
-       }
-   }
-}
 
 //o chão é seguro para salvar?
 verificar_solo_seguro = function()
@@ -669,17 +698,14 @@ function recebe_dano(_dano = 1)
 //Knockback após receber dano
 function knockback()
 {
-    if (hurt_id != 0) //Tomei hit
+    // PROTEÇÃO AQUI: Garante que quem me bateu ainda existe na tela!
+    if (hurt_id != 0 and instance_exists(hurt_id)) 
     {
-        //Verificando a posição horizontal de quem me atingiu
         var _dir = sign(x - hurt_id.x);
-        
-        // Segurança: Se estiverem no exato mesmo pixel, joga pra direita
         if (_dir == 0) _dir = 1; 
         
         forca_knock = _dir * max_velh * 0.8;
         velh = forca_knock;
-        
         hurt_id = 0;
     }    
     else 
@@ -687,12 +713,9 @@ function knockback()
         velh = max_velh * 0.8;
     }
         
-    velv = -max_velv * 0.6; // Força para cima um pouquinho mais perceptível
-    
-    // MAGIA: Desgruda o player do chão para o "movimento_vertical" não zerar a velocidade!
-    y -= 2; 
+    velv = -max_velv * 0.6; 
+    y -= 2; // Desgruda do chão
 }
-
 //Recupera vida e dispara alarme
 recupera_vida = function()
 {
@@ -848,69 +871,72 @@ estado_jump.roda = function()
     checando_paredes();
     movimento_horizontal();
     
-    //Verificando pouso
     if (velv > 0) tempo_queda_livre += desconta_timer();
-        else tempo_queda_livre = 0;
+    else tempo_queda_livre = 0;
     
-    //Variaveis
-    var tem_contato = (parede_dir or parede_esq);
-    var em_parede   = (!chao) and tem_contato;
-    var lado_atual  = parede_dir ? 0 : (parede_esq ? 1 : ultima_parede);
+    // --- AS VARIÁVEIS COM A MÁGICA ---
+    var tem_contato_fisico = (parede_dir or parede_esq); // Colisão exata
+    var em_parede_coyote   = (!chao) and (tem_contato_fisico or timer_parede > 0); // Colisão + Tolerância
+    var lado_atual         = ultima_parede; 
     
     if (sprite != spr_player_wall) 
     {
-        atacando(); //Nao ataco em wall slide 
+        atacando(); 
         marcando_inimigo();
     }
 
-    if (!chao and !em_parede and jump and jump_extra_left > 0) 
-    {
-        velv = -max_velv;
-        jump_extra_left--;
-        timer_pulo  = 0;    
-        timer_queda = 0; 
-        //sprite = spr_player_jump;
-        cria_particula(x, bbox_bottom, TIPO_PARTICULA.SHOCKWAVE, 1);
-        efeito_sonoro(sfx_double_jump, 60, 0.1)
-    }
+    // Usaremos isso para impedir que o Pulo Duplo saia junto
+    var _deu_pulo_parede = false;
 
-    //-Wall slide/Jump
-    if (em_parede) and (global.powerups[powerup.WALL]) 
+    // ===============================================
+    // PRIORIDADE 1: WALL JUMP
+    // ===============================================
+    if (em_parede_coyote) and (global.powerups[powerup.WALL]) 
     {
-        if (velv > 0) 
+        // O atrito da parede (escorregar) só funciona se eu estiver FISICAMENTE tocando nela
+        if (tem_contato_fisico) 
         {
-            velv = lerp(velv, deslize, 0.15);
-            velv = max(velv, min(deslize, max_velv)); 
-            sprite = spr_player_wall;
-            restart_powerups();
-            
-            if (random(100) < 15) 
+            if (velv > 0) 
             {
-            var _x_wall = parede_dir ? bbox_right : bbox_left;
-            cria_particula(_x_wall, y, TIPO_PARTICULA.POEIRA_DASH, 1);
-            //efeito_sonoro(sfx_wallslide, 50, 0.1)    
+                velv = lerp(velv, deslize, 0.15);
+                velv = max(velv, min(deslize, max_velv)); 
+                sprite = spr_player_wall;
+                restart_powerups();
                 
-            tempo_queda_livre = 0;    
+                if (random(100) < 15) 
+                {
+                    var _x_wall = parede_dir ? bbox_right : bbox_left;
+                    cria_particula(_x_wall, y, TIPO_PARTICULA.POEIRA_DASH, 1);
+                    tempo_queda_livre = 0;    
+                }
+            } 
+            else 
+            {
+                velv += (grav * global.vel_scale);
             }
-            
         } 
         else 
         {
-            velv += (grav*global.vel_scale);
+            // Se eu desgrudei, mas estou no Coyote Time, eu caio com gravidade normal
+            movimento_vertical();
         }
 
-        // Wall jump não consome pulo extra
+        // O Wall Jump em si (Ele aceita a tolerância do Coyote Time!)
         if (jump) 
         {
             velv = -max_velv;
-            velh = (lado_atual == 0) ? -max_velh :  max_velh;
+            velh = (lado_atual == 0) ? -max_velh : max_velh;
+            
             timer_pulo  = 0;
             timer_queda = 0;
-            sprite = spr_player_jump;
-            InputVibrateConstant(0.2, 0.0, 100)
-            cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 5)
-            efeito_sonoro(sfx_jump, 50, 0.1)
+            timer_parede = 0; // Mata o Coyote Time instantaneamente
             
+            sprite = spr_player_jump;
+            InputVibrateConstant(0.2, 0.0, 100);
+            cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 5);
+            efeito_sonoro(sfx_jump, 50, 0.1);
+            
+            _deu_pulo_parede = true; // Avisa que eu usei a parede!
         }
     } 
     else 
@@ -918,12 +944,28 @@ estado_jump.roda = function()
         // Ar livre padrão
         movimento_vertical();
     }
-    // Dash no ar
+
+    // ===============================================
+    // PRIORIDADE 2: DOUBLE JUMP
+    // ===============================================
+    // Só tenta dar o Double Jump se o Wall Jump NÃO foi executado e não estou mais no Coyote Time
+    if (!_deu_pulo_parede and !em_parede_coyote and jump and jump_extra_left > 0) 
+    {
+        velv = -max_velv;
+        jump_extra_left--;
+        timer_pulo  = 0;    
+        timer_queda = 0; 
+        cria_particula(x, bbox_bottom, TIPO_PARTICULA.SHOCKWAVE, 1);
+        efeito_sonoro(sfx_double_jump, 60, 0.1);
+    }
+
+    // ===============================================
+    // MECÂNICAS AÉREAS PADRÕES
+    // ===============================================
     aplica_dash();
     
-    //Saindo para flutuar
     var _caindo = velv > 0;
-    var _na_parede = parede_dir or parede_esq
+    var _na_parede = parede_dir or parede_esq;
     
     if (_caindo) and (jump) and (global.powerups[powerup.FLOAT]) and (!_na_parede)
     {
@@ -932,13 +974,11 @@ estado_jump.roda = function()
         exit;
     }
 
-    // Frames + pouso
     if (velv < 0) image_index = 0; 
     else image_index = clamp(image_index, 1, sprite_get_number(sprite) - 1);
 
     if (chao) 
     {
-        //Cai por muito tempo?
         if (tempo_queda_livre > limite_tempo_queda_land)
         {
             troca_estado(estado_land);
@@ -946,11 +986,10 @@ estado_jump.roda = function()
         else 
         { 
             troca_estado((abs(velh) > 0.1) ? estado_walk : estado_idle);
-            cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 3)
+            cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 3);
         }
         
         tempo_queda_livre = 0;
-        
         exit;
     }
 }
@@ -968,7 +1007,6 @@ estado_dash.inicia = function()
     else desconta_dura_dash = dura_dash;
     
     carga--;
-    desconta_dura_dash = dura_dash; 
     InputVibrateConstant(0.3, 0.0, 150)
     cria_particula(x, y - (sprite_height / 2), TIPO_PARTICULA.POEIRA_DASH, 5)
     efeito_sonoro(sfx_dash, 50, 0.05)
@@ -981,51 +1019,80 @@ estado_dash.inicia = function()
     
     dash_extensao_atual = 0;
     dash_extensao_maxima = 8;
+    
+    dei_long_jump = false;
 }
 
 estado_dash.roda = function() 
 {
-    velh = lengthdir_x(len, dir);
-    velv = lengthdir_y(len, dir);
-    
-    //Saindo do estado pulando
-    if (jump) and (chao or timer_pulo > 0)
+    // Se ainda não pulei, a velocidade é travada (dash normal)
+    if (!dei_long_jump)
     {
-        troca_estado(estado_jump);
-        
-        velh = (sign(velh) * max_velh) * 1.2;
-        velv = -max_velv;
-        
-        cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 5);
-        efeito_sonoro(sfx_jump, 50, 0.1);
-        
-        // Reset de timers para não gastar pulo duplo se estiver no chão
-        timer_pulo = 0;
-        timer_queda = 0;
-        return; 
+        velh = lengthdir_x(len, dir);
+        velv = lengthdir_y(len, dir);
     }
-    //Aplicando verificações
+    else
+    {
+        // Se dei o long jump, a física do pulo (gravidade) toma conta!
+        velv += (grav * global.vel_scale);
+    }
+    
+    if (abs(velh) < 0.1) velh = 0;
+    if (abs(velv) < 0.1) velv = 0;
+
     checando_chao();
     checando_paredes();
     atualiza_safe_ground();
-    //Descontando timer de dash
+
+    // ==========================================
+    // GATILHO DO LONG JUMP
+    // ==========================================
+    if (jump and (chao or timer_pulo > 0) and !dei_long_jump)
+    {
+        if (dir == 0 or dir == 180 or dir == 315 or dir == 225)
+        {
+            dei_long_jump = true; // Entra no modo Long Jump!
+            
+            velh = sign(velh) * (max_velh * 2.5); // 2.5x a vel máxima pra voar longe
+            velv = -max_velv * 0.7; // Pulo rasante
+            
+            // Opcional: Podemos aumentar o timer do dash aqui para o rastro durar o pulo todo
+            desconta_dura_dash = dura_dash * 1.5; 
+            
+            cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 8);
+            efeito_sonoro(sfx_jump, 50, 0.1);
+            InputVibrateConstant(0.4, 0.0, 200);
+            
+            timer_pulo = 0; 
+            timer_queda = 0;
+            // NÃO DAMOS RETURN NEM TROCAMOS DE ESTADO! O PLAYER CONTINUA NO DASH!
+        }
+        else 
+        {
+             // Pulo normal pra cancelar dash vertical
+             troca_estado(estado_jump);
+             velh = sign(velh) * max_velh;
+             velv = -max_velv;
+             timer_pulo = 0; timer_queda = 0;
+             return;
+        }
+    }
+    // ==========================================
+
     desconta_dura_dash -= desconta_timer();
     
-    
+    // Fim do timer do Dash
     if (desconta_dura_dash <= 0) 
     {
-        // Se a duração normal acabou, mas estou com o powerup e dentro do colisor sombrio...
         if (global.powerups[powerup.DASH_FANTASMA] and place_meeting(x, y, obj_colisor_sombrio))
         {
-            // Tento prolongar o dash!
             if (dash_extensao_atual < dash_extensao_maxima)
             {
-                desconta_dura_dash = desconta_timer(); // Dá mais 1 frame de vida
+                desconta_dura_dash = desconta_timer(); 
                 dash_extensao_atual++;
             }
             else
             {
-                // Limite estourou! Parede grossa demais. Vai pro finaliza para tomar o kickback.
                 if (chao) troca_estado( (abs(velh) > 0.1) ? estado_walk : estado_idle );
                 else      troca_estado(estado_jump);
                 exit;
@@ -1033,34 +1100,33 @@ estado_dash.roda = function()
         }
         else
         {
-            // Fim normal do dash
             if (chao) troca_estado( (abs(velh) > 0.1) ? estado_walk : estado_idle );
             else      troca_estado(estado_jump);
             exit;
         }
     }
     
-    if (current_time % 4 == 0) // Truque simples de timer
+    // Criando Rastro Fantasma do Dash
+    if (current_time % 4 == 0) 
     {
         var _rastro = instance_create_depth(x, y, depth + 1, obj_rastro);
         _rastro.sprite_index = sprite_index;
         _rastro.image_index = image_index;
-        _rastro.image_xscale = xscale;
-        _rastro.image_yscale = image_yscale;
+        _rastro.image_xscale = xscale; 
+        _rastro.image_yscale = image_yscale; 
+        
+        if (global.powerups[powerup.DASH_FANTASMA]) _rastro.image_blend = c_dkgray; 
     }
-    
-    if (global.powerups[powerup.DASH_FANTASMA])
-    {
-        inv = true;
-        image_alpha = 0.5;
-    }
-    
 };
 
 estado_dash.finaliza = function() {
     // reduz suavemente a velocidade ao sair do dash
-    velh = max_velh * sign(velh) * .5;
-    velv = max_velv * sign(velv) * 0.5;
+    if (!dei_long_jump)
+    {
+        velh = max_velh * sign(velh) * .5;
+        velv = max_velv * sign(velv) * 0.5;
+    }
+
     
     if (global.powerups[powerup.DASH_FANTASMA])
     {

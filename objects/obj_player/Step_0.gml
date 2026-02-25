@@ -15,7 +15,6 @@ if (_xscale_anterior != xscale) and (abs(velh) > 0.5) and (chao)
 roda_estado(); //Se começar a bugar lembrar de passar isso pra dps da colisao
 
 // Colisão
-plat_fina();
 colisao();
 verifica_espinho();
 
