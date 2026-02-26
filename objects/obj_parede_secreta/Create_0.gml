@@ -23,6 +23,9 @@ shake_x = 0;
 
 function recebe_dano(_dano = 1)
 {
+    if (obj_player.dir_atk == "vertical_down") exit;
+    if (obj_player.tipo_magia == "pound") vida_atual = 1;
+            
     vida_atual -= _dano;
     shake_x = 8; 
     inv = true; // Ativa invencibilidade breve para piscar

@@ -660,7 +660,7 @@ conjurando = function()
         if (!chao and down) 
         {
             var _custo_pound = 3; 
-            if (global.combo >= _custo_pound) 
+            if (global.combo > _custo_pound) 
             {
                 global.combo -= _custo_pound;
                 tipo_magia = "pound";
@@ -672,7 +672,7 @@ conjurando = function()
         else if (up) 
         {
             var _custo_tp = 4;
-            if (global.combo >= _custo_tp) and (global.inimigo_marcado != noone)
+            if (global.combo > _custo_tp) and (global.inimigo_marcado != noone)
             {
                 global.combo -= _custo_tp;
                 tipo_magia = "teleport";
@@ -686,7 +686,7 @@ conjurando = function()
             var _custo_bum = 2;
             
             // Só conjura se tiver combo E um inimigo marcado
-            if (global.combo >= _custo_bum) and (global.inimigo_marcado != noone) 
+            if (global.combo > _custo_bum) and (global.inimigo_marcado != noone) 
             {
                 global.combo -= _custo_bum;
                 tipo_magia = "bumerangue";
@@ -1587,55 +1587,104 @@ estado_land.roda = function()
 
 estado_land.finaliza = function() { }
 
-//Estado de magias
 //--Magic
 estado_magic.inicia = function()
 {
-    sprite = spr_player_attack; // No futuro, crie e use um 'spr_player_cast'
-    image_index = 0;
-    velh = 0; // O player para no lugar para conjurar
     magia_criada = false;
+    velh = 0; // Para o movimento horizontal
+    
+    if (tipo_magia == "pound")
+    {
+        // Se tiver uma sprite específica, coloque aqui (ex: spr_player_pound)
+        sprite = spr_player_jump; 
+        image_index = 0;
+        
+        // Dá um micro-pulo para cima para dar aquela sensação de "carregando o peso"
+        velv = -2; 
+        
+   
+    }
+    else // (Bumerangue e TP)
+    {
+        sprite = spr_player_attack; 
+        image_index = 0;
+    }
 }
 
 estado_magic.roda = function()
 {
+    // Lógicas de física padrão
     movimento_vertical(); 
     atualiza_safe_ground();
     checando_chao();
     checando_paredes();
     
-    // Dispara no 2º frame da animação (Ajuste conforme a sua sprite)
-    if (floor(image_index) == 2) and (!magia_criada)
+    // =======================================
+    // MAGIA: BUMERANGUE
+    // =======================================
+    if (tipo_magia == "bumerangue")
     {
-        magia_criada = true;
-        
-        if (tipo_magia == "bumerangue")
+        if (floor(image_index) == 2) and (!magia_criada)
         {
+            magia_criada = true;
             efeito_sonoro(sfx_attack, 50, 0.1); 
             
-            // Pega o meio exato do corpo do player baseado na colisão
             var _centro_y = (bbox_top + bbox_bottom) / 2;
             var _magia = instance_create_layer(x, _centro_y, "Instances", obj_bumerangue);
             _magia.pai = self; 
-            _magia.alvo = global.inimigo_marcado; // Passa quem está marcado!
+            _magia.alvo = global.inimigo_marcado; 
             _magia.dano = 1;
-            
-            // Define a direção inicial de saída baseada pra onde o player olha
             _magia.direction = (xscale == 1) ? 0 : 180;
             
-            // Aqui usamos a SUA função de recuo! O player vai deslizar pra trás sem virar o rosto.
             aplicar_recuo_ataque(4); 
         }
-        // (Os tiros do Ground Pound e TP entrarão aqui depois)
+        
+        // Sai do estado quando a animação acaba
+        if (finalizou_animacao())
+        {
+            if (!chao) troca_estado(estado_jump);
+            else if (right xor left) troca_estado(estado_walk);
+            else troca_estado(estado_idle);
+            exit;
+        }
     }
     
-    // Saindo do estado
-    if (finalizou_animacao())
+    // =======================================
+    // MAGIA: GROUND POUND (Pisão)
+    // =======================================
+    else if (tipo_magia == "pound")
     {
-        if (!chao) troca_estado(estado_jump);
-        else if (right xor left) troca_estado(estado_walk);
-        else troca_estado(estado_idle);
-        exit;
+        velv = 15
+        
+
+        
+        
+        
+        // 2. O IMPACTO NO CHÃO SÓLIDO
+        if (chao)
+        {
+            // Criando a área de dano usando o próprio obj_hit
+            var _hit = instance_create_layer(x, y, "Instances", obj_hit);
+            
+            // Esticamos a hitbox dele para os lados (ajuste o valor para a área desejada)
+            _hit.image_xscale = 7; 
+            _hit.image_yscale = 1;
+            _hit.dano = 1;
+            
+            // Some rápido, apenas o frame do impacto
+            _hit.alarm[0] = 5; 
+         
+
+            // Efeitos de impacto super pesados
+            InputVibrateConstant(0.8, 0, 200);
+            cria_particula(x, y, TIPO_PARTICULA.POEIRA_PULO, 8);
+            
+            // Adicione um som de estrondo aqui se tiver!
+            // efeito_sonoro(sfx_estrondo, 100, 0.1); 
+
+            troca_estado(estado_idle);
+            exit;
+        }
     }
 }
 
