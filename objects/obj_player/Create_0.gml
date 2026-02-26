@@ -1602,6 +1602,9 @@ estado_magic.inicia = function()
         // Dá um micro-pulo para cima para dar aquela sensação de "carregando o peso"
         velv = -2; 
         
+        inv = true;
+        inv_timer = 0
+        
    
     }
     else // (Bumerangue e TP)
@@ -1619,75 +1622,122 @@ estado_magic.roda = function()
     checando_chao();
     checando_paredes();
     
-    // =======================================
-    // MAGIA: BUMERANGUE
-    // =======================================
-    if (tipo_magia == "bumerangue")
+    switch (tipo_magia)
     {
-        if (floor(image_index) == 2) and (!magia_criada)
-        {
-            magia_criada = true;
-            efeito_sonoro(sfx_attack, 50, 0.1); 
+        // =======================================
+        // MAGIA: BUMERANGUE
+        // =======================================
+        case "bumerangue":
+            if (floor(image_index) == 2) and (!magia_criada)
+            {
+                magia_criada = true;
+                efeito_sonoro(sfx_attack, 50, 0.1); 
+                
+                var _centro_y = (bbox_top + bbox_bottom) / 2;
+                var _magia = instance_create_layer(x, _centro_y, "Instances", obj_bumerangue);
+                _magia.pai = self; 
+                _magia.alvo = global.inimigo_marcado; 
+                _magia.dano = 1;
+                _magia.direction = (xscale == 1) ? 0 : 180;
+                
+                aplicar_recuo_ataque(4); 
+            }
             
-            var _centro_y = (bbox_top + bbox_bottom) / 2;
-            var _magia = instance_create_layer(x, _centro_y, "Instances", obj_bumerangue);
-            _magia.pai = self; 
-            _magia.alvo = global.inimigo_marcado; 
-            _magia.dano = 1;
-            _magia.direction = (xscale == 1) ? 0 : 180;
-            
-            aplicar_recuo_ataque(4); 
-        }
-        
-        // Sai do estado quando a animação acaba
-        if (finalizou_animacao())
-        {
-            if (!chao) troca_estado(estado_jump);
-            else if (right xor left) troca_estado(estado_walk);
-            else troca_estado(estado_idle);
-            exit;
-        }
-    }
-    
-    // =======================================
-    // MAGIA: GROUND POUND (Pisão)
-    // =======================================
-    else if (tipo_magia == "pound")
-    {
-        velv = 15
-        
+            // Sai do estado quando a animação acaba
+            if (finalizou_animacao())
+            {
+                if (!chao) troca_estado(estado_jump);
+                else if (right xor left) troca_estado(estado_walk);
+                else troca_estado(estado_idle);
+                exit;
+            }
+        break;
 
-        
-        
-        
-        // 2. O IMPACTO NO CHÃO SÓLIDO
-        if (chao)
-        {
-            // Criando a área de dano usando o próprio obj_hit
-            var _hit = instance_create_layer(x, y, "Instances", obj_hit);
-            
-            // Esticamos a hitbox dele para os lados (ajuste o valor para a área desejada)
-            _hit.image_xscale = 7; 
-            _hit.image_yscale = 1;
-            _hit.dano = 1;
-            
-            // Some rápido, apenas o frame do impacto
-            _hit.alarm[0] = 5; 
-         
+        case "pound":
+            velv = 15;
+            // 2. O IMPACTO NO CHÃO SÓLIDO
+            if (chao)
+            {
+                // Criando a área de dano usando o próprio obj_hit
+                var _hit = instance_create_layer(x, y, "Instances", obj_hit_ground);
+                
+                _hit.dano = global.dano * .75;
+                
+                // Some rápido, apenas o frame do impacto
+                _hit.alarm[0] = 5; 
 
-            // Efeitos de impacto super pesados
-            InputVibrateConstant(0.8, 0, 200);
-            cria_particula(x, y, TIPO_PARTICULA.POEIRA_PULO, 8);
-            
-            // Adicione um som de estrondo aqui se tiver!
-            // efeito_sonoro(sfx_estrondo, 100, 0.1); 
+                // Efeitos de impacto super pesados
+                InputVibrateConstant(0.8, 0, 200);
+                cria_particula(x, y, TIPO_PARTICULA.POEIRA_PULO, 8);
+                
+                // Adicione um som de estrondo aqui se tiver!
+                // efeito_sonoro(sfx_estrondo, 100, 0.1); 
+                
+                inv_timer = 0.5;
 
-            troca_estado(estado_idle);
-            exit;
-        }
-    }
+                troca_estado(estado_idle);
+                exit;
+            }
+        break;
+        
+// =======================================
+        // MAGIA: TELEPORTE
+        // =======================================
+        case "teleport":
+            if (floor(image_index) == 1) and (!magia_criada)
+            {
+                magia_criada = true;
+                
+                if (global.inimigo_marcado != noone) instance_activate_object(global.inimigo_marcado);
+                
+                if (global.inimigo_marcado != noone and instance_exists(global.inimigo_marcado))
+                {
+                    var _alvo = global.inimigo_marcado;
+                    
+                    cria_particula(x, y - sprite_height/2, TIPO_PARTICULA.ALMA, 5);
+                    efeito_sonoro(sfx_dash, 50, 0.2); 
+                    
+                    x = _alvo.x;
+                    y = _alvo.bbox_top - 32; 
+                    
+                    while (place_meeting(x, y, obj_colisor))
+                    {
+                        y += 1;
+                        if (y > _alvo.y) break; 
+                    }
+                    
+                    inv = true;
+                    inv_timer = 0.5; 
+                    
+                    cria_particula(x, y, TIPO_PARTICULA.ALMA, 5);
+                    cria_particula(x, y, TIPO_PARTICULA.FAISCA, 3);
+                }
+                else
+                {
+                    global.combo += 4; 
+                    troca_estado(estado_idle);
+                    exit;
+                }
+            }
+            
+            // --- A MÁGICA DA SUSPENSÃO (HANG TIME) ACONTECE AQUI ---
+            if (magia_criada)
+            {
+                // Congela o player no ar anulando a gravidade até a animação acabar!
+                velh = 0;
+                velv = 0; 
+            }
+            // --------------------------------------------------------
+
+            if (finalizou_animacao())
+            {
+                dir_atk = "vertical_down"; 
+                troca_estado(estado_attack); 
+                exit;
+            }
+        break;
+    }    
 }
-
 estado_magic.finaliza = function()
 {
     tipo_magia = noone;
