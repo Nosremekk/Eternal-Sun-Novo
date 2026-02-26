@@ -14,6 +14,9 @@ switch(lista_powerup)
     case "tiro" : global.powerups[powerup.MARK] = true; break;
     case "celeste" : global.powerups[powerup.DASH_CELESTE] = true; break;
     case "fantasma" : global.powerups[powerup.DASH_FANTASMA] = true; break;
+    case "bumerangue" : global.powerups[powerup.MAGIC_BUMERANGUE] = true; break;
+    case "groundpound" : global.powerups[powerup.MAGIC_GROUNDPOUND] = true; break;
+    case "tp" : global.powerups[powerup.MAGIC_TELEPORT] = true; break;
     
 }
 

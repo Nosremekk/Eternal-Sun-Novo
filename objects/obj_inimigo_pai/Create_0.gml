@@ -97,11 +97,12 @@ aplica_knock = function()
 //Método para receber dano
 function recebe_dano(_dano = 1)
 {
+    var _combo = obj_player.estado_atual == obj_player.estado_attack and instance_exists(obj_hit);
     //Estou marcando
     var _critico = false;
     if (global.inimigo_marcado == id)
     {
-        adiciona_combo();
+        if (_combo) adiciona_combo();
         
         if (instance_exists(obj_player)) obj_player.inimigo_marcado_atingido = true;
         
@@ -161,7 +162,7 @@ function recebe_dano(_dano = 1)
         audio_sound_pitch(_snd, _pitch_combo);
     }
 
-    adiciona_combo();
+    if (_combo) adiciona_combo();
     
     //Recebi o dano fico transparente
     image_alpha = 0;

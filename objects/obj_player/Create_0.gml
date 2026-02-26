@@ -54,6 +54,9 @@ desliza_hit = false;
 atacando_parede = false;
 duracao_inv = 1.25;
 
+//Magias
+tipo_magia = noone;
+magia_criada = false;
 // inputs 
 up = false;
 down = false;
@@ -64,6 +67,7 @@ jump_s = false;
 dash = false;
 attack = false;
 marca_btn = false;
+magic_btn = false;
 
 // visual
 xscale = 1;
@@ -122,6 +126,7 @@ estado_espinho = new estado();
 estado_float = new estado();
 estado_wakeup = new estado();
 estado_land = new estado();
+estado_magic = new estado();
 
 //Camera
 instancia_camera = function()
@@ -141,6 +146,7 @@ controles = function() {
     dash = InputPressed(INPUT_VERB.DASH);
     attack = InputPressed(INPUT_VERB.ATTACK);
     marca_btn = InputPressed(INPUT_VERB.HOOK);
+    magic_btn = InputPressed(INPUT_VERB.MAGIC);
     
     if (attack) timer_atk_buffer = limite_buffer_atk;
 }
@@ -645,6 +651,52 @@ gerencia_timer_marca = function()
     }
 }
 
+//Conjurando Magia
+conjurando = function()
+{
+    if (magic_btn) and (estado_atual != estado_magic)
+    {
+        // Magia para Baixo: Ground Pound (Requer estar no ar)
+        if (!chao and down) 
+        {
+            var _custo_pound = 3; 
+            if (global.combo >= _custo_pound) 
+            {
+                global.combo -= _custo_pound;
+                tipo_magia = "pound";
+                troca_estado(estado_magic);
+                exit;
+            }
+        }
+        // Magia para Cima: Teleport (Requer inimigo marcado)
+        else if (up) 
+        {
+            var _custo_tp = 4;
+            if (global.combo >= _custo_tp) and (global.inimigo_marcado != noone)
+            {
+                global.combo -= _custo_tp;
+                tipo_magia = "teleport";
+                troca_estado(estado_magic);
+                exit;
+            }
+        }
+        // Magia Neutra: Bumerangue Teleguiado (Requer inimigo marcado)
+        else 
+        {
+            var _custo_bum = 2;
+            
+            // Só conjura se tiver combo E um inimigo marcado
+            if (global.combo >= _custo_bum) and (global.inimigo_marcado != noone) 
+            {
+                global.combo -= _custo_bum;
+                tipo_magia = "bumerangue";
+                troca_estado(estado_magic);
+                exit;
+            }
+        }
+    }
+}
+
 //Função de aplicar dash
 aplica_dash = function()
 {
@@ -812,6 +864,8 @@ estado_idle.roda = function()
     //Atacando
     atacando();
     marcando_inimigo();
+    //Conjuracao
+    conjurando();
 
     if (chao) restart_powerups();
         
@@ -837,6 +891,9 @@ estado_walk.roda = function()
     atualiza_safe_ground();
     atacando();
     marcando_inimigo();
+    //Conjuracao
+    conjurando();
+    
     if (chao) restart_powerups(); 
 
     aplica_dash();
@@ -883,6 +940,9 @@ estado_jump.roda = function()
     {
         atacando(); 
         marcando_inimigo();
+        
+        //Conjuracao
+        conjurando();
     }
 
     // Usaremos isso para impedir que o Pulo Duplo saia junto
@@ -1526,6 +1586,63 @@ estado_land.roda = function()
 }
 
 estado_land.finaliza = function() { }
+
+//Estado de magias
+//--Magic
+estado_magic.inicia = function()
+{
+    sprite = spr_player_attack; // No futuro, crie e use um 'spr_player_cast'
+    image_index = 0;
+    velh = 0; // O player para no lugar para conjurar
+    magia_criada = false;
+}
+
+estado_magic.roda = function()
+{
+    movimento_vertical(); 
+    atualiza_safe_ground();
+    checando_chao();
+    checando_paredes();
+    
+    // Dispara no 2º frame da animação (Ajuste conforme a sua sprite)
+    if (floor(image_index) == 2) and (!magia_criada)
+    {
+        magia_criada = true;
+        
+        if (tipo_magia == "bumerangue")
+        {
+            efeito_sonoro(sfx_attack, 50, 0.1); 
+            
+            // Pega o meio exato do corpo do player baseado na colisão
+            var _centro_y = (bbox_top + bbox_bottom) / 2;
+            var _magia = instance_create_layer(x, _centro_y, "Instances", obj_bumerangue);
+            _magia.pai = self; 
+            _magia.alvo = global.inimigo_marcado; // Passa quem está marcado!
+            _magia.dano = 1;
+            
+            // Define a direção inicial de saída baseada pra onde o player olha
+            _magia.direction = (xscale == 1) ? 0 : 180;
+            
+            // Aqui usamos a SUA função de recuo! O player vai deslizar pra trás sem virar o rosto.
+            aplicar_recuo_ataque(4); 
+        }
+        // (Os tiros do Ground Pound e TP entrarão aqui depois)
+    }
+    
+    // Saindo do estado
+    if (finalizou_animacao())
+    {
+        if (!chao) troca_estado(estado_jump);
+        else if (right xor left) troca_estado(estado_walk);
+        else troca_estado(estado_idle);
+        exit;
+    }
+}
+
+estado_magic.finaliza = function()
+{
+    tipo_magia = noone;
+}
 
 
 

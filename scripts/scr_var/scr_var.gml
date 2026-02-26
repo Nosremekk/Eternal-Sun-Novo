@@ -184,10 +184,13 @@ enum powerup
     FLOAT,
     MARK,
     DASH_CELESTE,
-    DASH_FANTASMA
+    DASH_FANTASMA,
+    MAGIC_BUMERANGUE,
+    MAGIC_GROUNDPOUND,
+    MAGIC_TELEPORT
 }
 
-global.powerups = [false, false, 0,false,false,false,false,false];
+global.powerups = [false, false, 0,false,false,false,false,false,false,false,false];
 global.max_carga = 1;
 
 //Tiro
@@ -233,7 +236,7 @@ function reset_variaveis_jogo()
     }
 
     //Resetando variaveis
-    global.powerups = [false, false, 0,false,false,false,false,false];
+    global.powerups = [false, false, 0,false,false,false,false,false,false,false,false];
     global.max_carga = 1;
     
     // --- RESET DE STATS GLOBAIS ---

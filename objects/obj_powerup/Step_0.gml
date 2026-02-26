@@ -20,6 +20,13 @@ switch(lista_powerup) //Me destruindo caso ja tenha o powerup
     
     case "celeste":    if (global.powerups[powerup.DASH_CELESTE] == true) instance_destroy(); break;
         
-    case "fantasma":    if (global.powerups[powerup.DASH_FANTASMA] == true) instance_destroy(); break;            
+    case "fantasma":    if (global.powerups[powerup.DASH_FANTASMA] == true) instance_destroy(); break;
+        
+    case "bumerangue":    if (global.powerups[powerup.MAGIC_BUMERANGUE] == true) instance_destroy(); break;
+        
+    case "groundpound":    if (global.powerups[powerup.MAGIC_GROUNDPOUND] == true) instance_destroy(); break;
+        
+    case "tp":    if (global.powerups[powerup.MAGIC_TELEPORT == true]) instance_destroy(); break;
+                    
     
 }
