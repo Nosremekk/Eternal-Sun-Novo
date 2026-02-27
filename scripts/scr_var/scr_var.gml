@@ -36,6 +36,9 @@ global.limite_combo = 6;
 global.dano_combo = 2;
 global.timer_combo = 10; // Segundos
 
+//Capitalismo
+global.dinheiro = 0; 
+
 //Outros
 global.permanentemente_quebrado = {};
 global.itens_coletados = {};
@@ -294,6 +297,9 @@ function reset_variaveis_jogo()
     // Reset Variáveis de Controle
     global.dados_load_pendente = undefined;
     global.timer_icone_save = 0;
+    
+    //Reset capital
+    global.dinheiro = 0;
     
     show_debug_message("--- MEMÓRIA DE JOGO RESETADA ---");
 }

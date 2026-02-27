@@ -7,6 +7,10 @@ hud_alpha  = 0;
 talk = false;
 morto = false;
 
+// --- NOVO: MULTIPLICADOR DE ESCALA (Porcentagem) ---
+// 1.0 = 100% (Tamanho Original). 0.7 = 70% do tamanho. Ajuste como preferir!
+hud_escala_mult = 0.7; 
+
 // Refs globais (Agora pega direto da global)
 vida_anterior = global.vida_atual;
 combo_anterior = 0;
@@ -29,6 +33,12 @@ mark_scale = 1;
 mark_flash = 0;
 mark_active_prev = false;
 
+//Dinheiro
+dinheiro_alvo    = global.dinheiro; // O valor real
+dinheiro_exibido = global.dinheiro; // O valor falso que "roda" até alcançar o alvo
+timer_dinheiro   = 0;
+alpha_dinheiro   = 0;
+pop_moeda        = 1; // Multiplicador para o efeitinho de pular
 // Area Vars
 area_display_nome  = "";
 area_display_alpha = 0;
@@ -145,7 +155,6 @@ desenha_icone_save = function()
 
 desenha_vida = function()
 {
-    // ATUALIZADO: Usa globais, então desenha mesmo se o player não existir
     var _vida_max   = global.vida_max;
     var _vida_atual = global.vida_atual;
 
@@ -170,7 +179,9 @@ desenha_vida = function()
     avatar_scale_y = lerp(avatar_scale_y, 1, 0.15);
     heart_pop_scale = lerp(heart_pop_scale, 0, 0.2);
 
-    var _s = get_hud_scale(); 
+    // --- APLICA A REDUÇÃO DA ESCALA AQUI ---
+    var _s = get_hud_scale() * hud_escala_mult; 
+    
     var _shake_x = random_range(-life_shake, life_shake) * _s;
     var _shake_y = random_range(-life_shake, life_shake) * _s;
     var _mx = display_get_gui_width() * 0.03; 
@@ -194,7 +205,7 @@ desenha_vida = function()
 
     draw_sprite_ext(_spr, 0, _ax + _offx, _ay + _offy, _fsx, _fsy, 0, _cav, 1 * hud_alpha);
 
-    // Hearts (Loop baseado na vida MAX global)
+    // Hearts
     var _bx = _ax + _w_orig + (_mx * 0.5);
     var _hbs = _s * 2;
     var _hh = sprite_get_height(spr_life_full) * _hbs;
@@ -232,7 +243,9 @@ desenha_combo = function()
     if (combo_flash > 0) combo_flash = lerp(combo_flash, 0, 0.1);
     if (hud_shake_x > 0) hud_shake_x = lerp(hud_shake_x, 0, 0.2);
 
-    var _s = get_hud_scale();
+    // --- APLICA A REDUÇÃO DA ESCALA AQUI ---
+    var _s = get_hud_scale() * hud_escala_mult;
+    
     var _mx = display_get_gui_width() * 0.03;
     var _my = display_get_gui_height() * 0.03;
     
@@ -240,7 +253,6 @@ desenha_combo = function()
     var _av_h = sprite_get_height(spr_avatar_life) * _s * 2;
 
     var _is_max = (global.combo >= global.limite_combo);
-    // ATUALIZADO: Compara com global
     var _is_over = (_is_max and (global.vida_atual >= global.vida_max));
     
     var _shx = random_range(-hud_shake_x, hud_shake_x) * _s;
@@ -256,7 +268,6 @@ desenha_combo = function()
 
     var _pct = clamp(max(0, combo_display - 1) / max(1, global.limite_combo - 1), 0, 1);
     
-    // Timer do combo precisa do player, então protegemos
     var _ptm = 0;
     if (instance_exists(obj_player)) {
         _ptm = (global.combo > 1) ? (1 - (obj_player.timer_dano / global.timer_combo)) : 0;
@@ -284,7 +295,6 @@ desenha_combo = function()
         gpu_set_blendmode(bm_normal);
     }
     
-    // Alarme Visual
     if (instance_exists(obj_player)) {
         if (obj_player.dispara_alarme and global.combo > 1 and !_is_max) {
             draw_set_color(c_white);
@@ -304,7 +314,9 @@ desenha_marca = function()
     mark_scale = lerp(mark_scale, 1, 0.1);
     mark_flash = lerp(mark_flash, 0, 0.1);
 
-    var _s = get_hud_scale();
+    // --- APLICA A REDUÇÃO DA ESCALA AQUI ---
+    var _s = get_hud_scale() * hud_escala_mult;
+    
     var _mx = display_get_gui_width() * 0.03;
     var _my = display_get_gui_height() * 0.03;
     
@@ -353,6 +365,95 @@ desenha_marca = function()
         }
     }
     draw_set_color(c_white); draw_set_alpha(1);
+}
+
+desenha_dinheiro = function()
+{
+    // 1. Aciona o fade e o efeito "Pop" se ganhou/gastou dinheiro
+    if (global.dinheiro != dinheiro_alvo)
+    {
+        dinheiro_alvo = global.dinheiro;
+        timer_dinheiro = 3; 
+        pop_moeda = 2.0; // Faz o ícone inchar o dobro do tamanho instantaneamente!
+    }
+
+    // 2. Faz o número "rodar" suavemente até o valor real
+    if (dinheiro_exibido != dinheiro_alvo)
+    {
+        dinheiro_exibido = lerp(dinheiro_exibido, dinheiro_alvo, 0.1);
+        // Garante que não fique número quebrado no final
+        if (abs(dinheiro_exibido - dinheiro_alvo) < 0.5) dinheiro_exibido = dinheiro_alvo; 
+    }
+
+    // 3. Suaviza os timers e efeitos
+    if (timer_dinheiro > 0)
+    {
+        timer_dinheiro -= desconta_timer();
+        alpha_dinheiro = lerp(alpha_dinheiro, 1, 0.15); 
+    }
+    else
+    {
+        alpha_dinheiro = lerp(alpha_dinheiro, 0, 0.05); 
+    }
+    
+    // O ícone desincha suavemente de volta ao tamanho normal (1)
+    pop_moeda = lerp(pop_moeda, 1, 0.15);
+
+    // 4. Desenha na tela (CANTO SUPERIOR DIREITO)
+    if (alpha_dinheiro > 0.01)
+    {
+        var _s = get_hud_scale() * hud_escala_mult;
+        
+        // --- HIERARQUIA VISUAL ---
+        // Texto um pouco menor e mais elegante (1.2). Moeda grandona (3.0).
+        var _escala_texto = _s * 1.2; 
+        var _escala_moeda_base = _s * 3.0; 
+        var _escala_animada = _escala_moeda_base * pop_moeda; 
+        
+        var _margem_tela = display_get_gui_width() * 0.03;
+        var _my = display_get_gui_height() * 0.03;
+        
+        var _alpha_final = alpha_dinheiro * hud_alpha;
+        draw_set_alpha(_alpha_final);
+        
+        // --- 1. CONFIGURA O TEXTO ---
+        var _texto = string(round(dinheiro_exibido)); 
+        
+        draw_set_font(fnt_dialogo);
+        draw_set_halign(fa_right); 
+        draw_set_valign(fa_middle); 
+        
+       
+        var _x_texto = round(display_get_gui_width() - _margem_tela);
+        var _y_base = round(_my + (20 * _s)); 
+        
+        // Sombra leve e depois o texto
+        draw_set_color(c_black);
+        draw_text_transformed(_x_texto + (2*_s), _y_base + (2*_s), _texto, _escala_texto, _escala_texto, 0);
+        draw_set_color(c_white); 
+        draw_text_transformed(_x_texto, _y_base, _texto, _escala_texto, _escala_texto, 0);
+        
+        // --- 2. MATEMÁTICA ANTI-SOBREPOSIÇÃO ---
+        var _largura_texto = string_width(_texto) * _escala_texto;
+        var _largura_sprite = sprite_get_width(spr_dinheiro) * _escala_animada;
+        
+        // Pega exatamente a ponta esquerda do texto
+        var _limite_esquerdo_texto = _x_texto - _largura_texto;
+        
+        // Recua a moeda com base no limite do texto, tira a metade direita da moeda e dá 10px de folga
+        var _folga = 12 * _s;
+        var _x_moeda = round(_limite_esquerdo_texto - (_largura_sprite / 2) - _folga);
+        
+        // Desenha a moeda cravada no grid
+        draw_sprite_ext(spr_dinheiro, 0, _x_moeda, _y_base, _escala_animada, _escala_animada, 0, c_white, _alpha_final);
+        
+        // Reseta os defaults
+        draw_set_alpha(1);
+        draw_set_color(c_white);
+        draw_set_font(-1); 
+        draw_set_halign(-1); 
+        draw_set_valign(-1);
+    }
 }
 
 desenha_nome_area = function()
@@ -424,6 +525,7 @@ desenha_tudo = function()
         desenha_vida();
         desenha_combo();
         desenha_marca();
+        desenha_dinheiro(); 
         desenha_nome_area_mini();
     }
     desenha_icone_save();

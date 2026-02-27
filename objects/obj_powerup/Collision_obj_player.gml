@@ -16,10 +16,9 @@ switch(lista_powerup)
     case "fantasma" : global.powerups[powerup.DASH_FANTASMA] = true; break;
     case "bumerangue" : global.powerups[powerup.MAGIC_BUMERANGUE] = true; break;
     case "groundpound" : global.powerups[powerup.MAGIC_GROUNDPOUND] = true; break;
-    case "tp" : global.powerups[powerup.MAGIC_TELEPORT] = true; break;
+    case "teleporte" : global.powerups[powerup.MAGIC_TELEPORT] = true; break;
     
 }
-
 
 
 

@@ -94,6 +94,12 @@ if (global.dados_load_pendente != undefined) and (instance_exists(obj_player))
 
     if (variable_struct_exists(_dados, "eventos_mundo")) global.eventos = _dados.eventos_mundo;
     else inicializa_eventos_mundo();
+        
+    if (variable_struct_exists(_dados.player, "dinheiro")) {
+        global.dinheiro = _dados.player.dinheiro;
+    } else {
+        global.dinheiro = 0;
+    }
 
     // Finalização
     global.dados_load_pendente = undefined;

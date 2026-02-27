@@ -40,7 +40,7 @@
         "\"fantasma\"",
         "\"bumerangue\"",
         "\"groundpound\"",
-        "\"tp\"",
+        "\"teleporte\"",
       ],"multiselect":false,"name":"lista_powerup","rangeEnabled":false,"rangeMax":10.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"dash\"","varType":6,},
   ],
   "resourceType":"GMObject",

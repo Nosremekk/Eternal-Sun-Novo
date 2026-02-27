@@ -46,6 +46,8 @@ x_nativo = xstart;
 y_nativo = ystart;
 voltando = false;
 
+combado = false;
+
 //Metódo de knockback
 knock_timer = inv_timer/3;
 knock_timer_max = knock_timer;
@@ -97,7 +99,7 @@ aplica_knock = function()
 //Método para receber dano
 function recebe_dano(_dano = 1)
 {
-    var _combo = obj_player.estado_atual == obj_player.estado_attack and instance_exists(obj_hit);
+    var _combo = combado and obj_player.estado_atual == obj_player.estado_attack;
     //Estou marcando
     var _critico = false;
     if (global.inimigo_marcado == id)
@@ -206,6 +208,9 @@ function recebe_dano(_dano = 1)
     
     //Pogo 
     obj_player.aplicar_pogo(true);
+    
+    //Tirando combo
+    combado = false;
 }
 
 /*

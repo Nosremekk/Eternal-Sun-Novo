@@ -654,15 +654,15 @@ gerencia_timer_marca = function()
 //Conjurando Magia
 conjurando = function()
 {
-    if (magic_btn) and (estado_atual != estado_magic)
+    if (magic_btn) and (estado_atual != estado_magic) and (global.powerups[powerup.MAGIC_GROUNDPOUND])
     {
         // Magia para Baixo: Ground Pound (Requer estar no ar)
         if (!chao and down) 
         {
-            var _custo_pound = 3; 
-            if (global.combo > _custo_pound) 
+            var _custo = 2; 
+            if (global.combo > _custo) 
             {
-                global.combo -= _custo_pound;
+                global.combo -= _custo;
                 tipo_magia = "pound";
                 troca_estado(estado_magic);
                 exit;
@@ -671,24 +671,28 @@ conjurando = function()
         // Magia para Cima: Teleport (Requer inimigo marcado)
         else if (up) 
         {
-            var _custo_tp = 4;
-            if (global.combo > _custo_tp) and (global.inimigo_marcado != noone)
+            var _custo = 3;
+            if (global.combo > _custo) and (global.inimigo_marcado != noone) 
             {
-                global.combo -= _custo_tp;
-                tipo_magia = "teleport";
-                troca_estado(estado_magic);
-                exit;
+                if (global.powerups[powerup.MAGIC_TELEPORT])
+                { 
+                   global.combo -= _custo;
+                   tipo_magia = "teleport";
+                   troca_estado(estado_magic);
+                   exit;
+                }
+
             }
         }
         // Magia Neutra: Bumerangue Teleguiado (Requer inimigo marcado)
         else 
         {
-            var _custo_bum = 2;
+            var _custo = 1;
             
             // Só conjura se tiver combo E um inimigo marcado
-            if (global.combo > _custo_bum) and (global.inimigo_marcado != noone) 
+            if (global.combo > _custo) and (global.inimigo_marcado != noone) and (global.powerups[powerup.MAGIC_BUMERANGUE]) 
             {
-                global.combo -= _custo_bum;
+                global.combo -= _custo;
                 tipo_magia = "bumerangue";
                 troca_estado(estado_magic);
                 exit;
@@ -1714,7 +1718,6 @@ estado_magic.roda = function()
                 }
                 else
                 {
-                    global.combo += 4; 
                     troca_estado(estado_idle);
                     exit;
                 }

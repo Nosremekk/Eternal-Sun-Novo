@@ -26,6 +26,9 @@ animacao();
 if (dispara_alarme) alarme_vida();
 gerencia_timer_marca();    
 
+//Limita o combo
+global.combo = clamp(global.combo,1,global.limite_combo);
+
 
 
 // Sincroniza luz com player

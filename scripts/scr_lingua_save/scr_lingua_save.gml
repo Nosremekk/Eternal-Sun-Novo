@@ -106,7 +106,8 @@ function salvando_jogo(_save = global.save, _eh_checkpoint = false)
             vida      : global.vida_atual, // Salva quanto de vida tem AGORA
             velh_base : global.velh_base,  // Salva a velocidade BASE
             
-            powerups  : global.powerups
+            powerups  : global.powerups,
+            dinheiro : global.dinheiro
         },
         amuletos :
         {
