@@ -24,7 +24,6 @@ interagir = function()
     // A SOLUÇÃO: method(id, ...) garante que o callback rode no contexto deste mercador
     var _cb = method(id, function() 
     {
-        global.pause = true; 
         
         // Como o contexto foi amarrado ao mercador, ele acha o 'estoque' perfeitamente
         instance_create_layer(0, 0, "Controladores", obj_loja, {

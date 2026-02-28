@@ -125,6 +125,7 @@
     {"id":{"name":"fnt_inventario","path":"fonts/fnt_inventario/fnt_inventario.yy",},},
     {"id":{"name":"fnt_versao","path":"fonts/fnt_versao/fnt_versao.yy",},},
     {"id":{"name":"__InputUpdateController","path":"objects/__InputUpdateController/__InputUpdateController.yy",},},
+    {"id":{"name":"obj_aviso_importante","path":"objects/obj_aviso_importante/obj_aviso_importante.yy",},},
     {"id":{"name":"obj_aviso_item","path":"objects/obj_aviso_item/obj_aviso_item.yy",},},
     {"id":{"name":"obj_bumerangue","path":"objects/obj_bumerangue/obj_bumerangue.yy",},},
     {"id":{"name":"obj_cam_regiao","path":"objects/obj_cam_regiao/obj_cam_regiao.yy",},},

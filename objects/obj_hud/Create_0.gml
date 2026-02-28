@@ -93,7 +93,11 @@ controla_alpha_hud = function()
 pausando = function()
 {
     if (morto or talk) exit;
-    if (InputPressed(INPUT_VERB.PAUSE) and !global.abre_inventario)
+    
+    // NOVO: Agrupa todas as telas que "congelam" o jogo em uma variável só
+    var _outros_menus = global.abre_inventario or instance_exists(obj_loja) or instance_exists(obj_aviso_importante);
+    
+    if (InputPressed(INPUT_VERB.PAUSE) and !_outros_menus)
     {
         if (!global.pause)
         {
@@ -113,12 +117,20 @@ pausando = function()
             }
         }
     }
-    if (global.pause and !instance_exists(obj_menu) and !global.abre_inventario) global.pause = false;
+    
+    // CORREÇÃO: Agora o HUD respeita o Pause da Loja e do Aviso Importante!
+    if (global.pause and !instance_exists(obj_menu) and !_outros_menus) 
+    {
+        global.pause = false;
+    }
 }
 
 abrindo_inventario = function()
 {
-    if (InputPressed(INPUT_VERB.OPEN_INVENTORY) and !global.pause and !global.abre_inventario and !talk and !morto)
+    // NOVO: Impede de abrir o inventário por cima de outras telas
+    var _bloqueia_inv = instance_exists(obj_loja) or instance_exists(obj_aviso_importante) or instance_exists(obj_menu);
+    
+    if (InputPressed(INPUT_VERB.OPEN_INVENTORY) and !global.pause and !global.abre_inventario and !talk and !morto and !_bloqueia_inv)
     {
         global.abre_inventario = true;
         global.pause = true;

@@ -1,3 +1,5 @@
+global.pause = true;
+
 produtos = [];
 index_selecionado = 0;
 anim_escala = 0;

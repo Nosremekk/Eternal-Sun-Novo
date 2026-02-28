@@ -67,7 +67,7 @@ interagir = function()
             // Callback para entregar o item ao fechar a caixa de texto
             _callback = function()
             {
-                adiciona_item_chave(KEY_MARCO_PAPP);
+                adiciona_item_chave(KEY_MARCO_PAPP,1,true);
                 show_debug_message("CALLBACK: Chave entregue ao player.");
             };
         }

@@ -58,6 +58,17 @@ function gerencia_notificacoes()
     }
 }
 
+//Notificação de item importante
+function notificar_item_importante(_titulo,_texto,_sprite)
+{
+    instance_create_layer(0, 0, "Controladores", obj_aviso_importante, 
+    {
+         titulo_key: _titulo,
+         texto_key: _texto, // Ou crie uma chave nova de lore para o dash!
+         sprite: _sprite
+    });
+}
+
 // --- DB VISUAL (ITENS CHAVE) ---
 global.db_itens_info = {};
 
@@ -147,25 +158,32 @@ function cria_amuleto(_nome_key, _desc_key, _spr, _tipo_efeito, _valor_efeito, _
         }
     }
     
-    pega_item = function()
-    {
-        var _cols = ds_grid_width(global.inventario);
-        var _lins = ds_grid_height(global.inventario);
-        for (var _i = 0; _i < _lins; _i++)
+    pega_item = function(_importante = false) 
         {
-            for (var _j = 0; _j < _cols; _j++)
+            var _cols = ds_grid_width(global.inventario);
+            var _lins = ds_grid_height(global.inventario);
+            for (var _i = 0; _i < _lins; _i++)
             {
-                var _atual = global.inventario[# _j,_i]
-                if (!_atual)
+                for (var _j = 0; _j < _cols; _j++)
                 {
-                    global.inventario[# _j,_i] = global.amuletos[| meu_id];
-                    notificar_item(nome_key, spr);
-                    return true;
+                    var _atual = global.inventario[# _j,_i]
+                    if (!_atual)
+                    {
+                        global.inventario[# _j,_i] = global.amuletos[| meu_id];
+                        
+                        // --- CHECAGEM DE IMPORTÂNCIA ---
+                        if (_importante) {
+                            notificar_item_importante(nome_key, desc_key, spr);
+                        } else {
+                            notificar_item(nome_key, spr);
+                        }
+                        
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        return false;
-    }
 }
 
 enum amuletos { vida, forca, rapidez }
@@ -232,7 +250,7 @@ function inicializa_sistema_itens_chave()
     }
 }
 
-function adiciona_item_chave(_item_id, _quantidade = 1)
+function adiciona_item_chave(_item_id, _quantidade = 1, _importante = false) // <-- Opcional adicionado
 {
     var _qtd = ds_map_find_value(global.itens_chave, _item_id) ?? 0;
     ds_map_replace(global.itens_chave, _item_id, _qtd + _quantidade);
@@ -241,7 +259,12 @@ function adiciona_item_chave(_item_id, _quantidade = 1)
     
     if (_info != undefined)
     {
-        notificar_item(_info.nome_key, _info.spr);
+        // --- CHECAGEM DE IMPORTÂNCIA ---
+        if (_importante) {
+            notificar_item_importante(_info.nome_key, _info.desc_key, _info.spr);
+        } else {
+            notificar_item(_info.nome_key, _info.spr);
+        }
     }
     else
     {

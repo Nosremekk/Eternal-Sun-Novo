@@ -1,6 +1,4 @@
-texto_key = ""; 
-sprite = -1;     
-subimg = 0; 
+
 
 // Configuração
 titulo_key = "ui_item_get";

@@ -1,6 +1,7 @@
 {
   "FolderOrderSettings":[],
   "ResourceOrderSettings":[
+    {"name":"obj_aviso_importante","order":1,"path":"objects/obj_aviso_importante/obj_aviso_importante.yy",},
     {"name":"obj_bumerangue","order":2,"path":"objects/obj_bumerangue/obj_bumerangue.yy",},
     {"name":"obj_cam_regiao","order":1,"path":"objects/obj_cam_regiao/obj_cam_regiao.yy",},
     {"name":"obj_colisor_sombrio","order":2,"path":"objects/obj_colisor_sombrio/obj_colisor_sombrio.yy",},

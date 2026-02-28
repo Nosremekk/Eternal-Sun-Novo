@@ -1,3 +1,5 @@
+if (instance_exists(obj_aviso_importante)) exit;
+if (!global.pause) global.pause = true;    
 // Suaviza a abertura
 if (anim_escala < 1) anim_escala = lerp(anim_escala, 1, 0.15);
 
@@ -27,25 +29,25 @@ if (_inputs.confirma)
             switch (_item.tipo)
             {
                 case "item":
-                    adiciona_item_chave(_item.ref_id, 1);
+                    adiciona_item_chave(_item.ref_id, 1,true);
                     break;
                     
                 case "amuleto":
-                    global.amuletos[| _item.ref_id].pega_item();
+                    global.amuletos[| _item.ref_id].pega_item(true);
                     break;
                     
                 case "fragmento":
                     global.fragmentos_vida++;
                     atualiza_stats_player();
                     // NOME NA NOTIFICAÇÃO TRADUZIDO
-                    notificar_item(get_text("item_frag_vida_nome"), spr_fragmento_vida);
+                    notificar_item("item_frag_vida_nome", spr_fragmento_vida);
                     break;
                 
                 case "fragmento_tempo":
                     global.fragmentos_tempo++;
                     atualiza_stats_player();
-                    // NOME NA NOTIFICAÇÃO TRADUZIDO
-                    notificar_item(get_text("item_frag_foco_nome"), spr_fragmento_tempo);
+          
+                    notificar_item("item_frag_foco_nome", spr_fragmento_tempo);
                     break;
             }
             

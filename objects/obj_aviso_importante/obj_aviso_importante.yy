@@ -1,6 +1,6 @@
 {
   "$GMObject":"",
-  "%Name":"obj_loja",
+  "%Name":"obj_aviso_importante",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
@@ -8,11 +8,11 @@
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"obj_loja",
+  "name":"obj_aviso_importante",
   "overriddenProperties":[],
   "parent":{
-    "name":"controladores",
-    "path":"folders/Objects/controladores.yy",
+    "name":"efeitos",
+    "path":"folders/Objects/efeitos.yy",
   },
   "parentObjectId":null,
   "persistent":false,
