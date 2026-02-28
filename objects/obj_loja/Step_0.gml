@@ -20,20 +20,42 @@ if (_inputs.confirma)
             global.dinheiro -= _item.preco;
             global.permanentemente_quebrado[$ _item.chave] = true;
             
-            // Você pode adicionar um som de compra aqui se quiser
             // efeito_sonoro(snd_comprar, 50, 0); 
             InputVibrateConstant(0.2, 0.0, 100); // Game feel!
             
-            // Entrega
-            if (_item.tipo == "item") adiciona_item_chave(_item.ref_id, 1);
-            else if (_item.tipo == "amuleto") global.amuletos[| _item.ref_id].pega_item();
+            // --- ENTREGA DOS PRODUTOS VIA SWITCH ---
+            switch (_item.tipo)
+            {
+                case "item":
+                    adiciona_item_chave(_item.ref_id, 1);
+                    break;
+                    
+                case "amuleto":
+                    global.amuletos[| _item.ref_id].pega_item();
+                    break;
+                    
+                case "fragmento":
+                    global.fragmentos_vida++;
+                    atualiza_stats_player();
+                    // NOME NA NOTIFICAÇÃO TRADUZIDO
+                    notificar_item(get_text("item_frag_vida_nome"), spr_fragmento_vida);
+                    break;
+                
+                case "fragmento_tempo":
+                    global.fragmentos_tempo++;
+                    atualiza_stats_player();
+                    // NOME NA NOTIFICAÇÃO TRADUZIDO
+                    notificar_item(get_text("item_frag_foco_nome"), spr_fragmento_tempo);
+                    break;
+            }
             
             // Remove da prateleira
             array_delete(produtos, index_selecionado, 1);
             
             // Checa se acabou
             if (array_length(produtos) == 0) {
-                array_push(produtos, { nome: "Esgotado", desc: "Já comprei tudo...", preco: 0, spr: noone, tipo: "none" });
+                // TEXTO "ESGOTADO" TRADUZIDO
+                array_push(produtos, { nome: get_text("loja_esgotado_nome"), desc: get_text("loja_esgotado_desc"), preco: 0, spr: noone, tipo: "none" });
                 index_selecionado = 0;
             } else {
                 // Previne que o índice saia da lista após deletar o último item
@@ -52,7 +74,7 @@ if (_inputs.confirma)
 // Fechar
 if (_inputs.voltar_btn or _inputs.aplica_pause) 
 {
-    InputVerbConsumeAll()
+    InputVerbConsumeAll();
     global.pause = false; 
     with(obj_player) troca_estado(estado_idle);
     instance_destroy();

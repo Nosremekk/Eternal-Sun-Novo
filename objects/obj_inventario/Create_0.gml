@@ -236,7 +236,9 @@ desenha_aba_status = function(_inv_x, _inv_w, _cont_y, _cont_h)
     
     draw_set_halign(fa_left); draw_set_valign(fa_top);
     
-    // Coluna 1: Atributos
+    // ==========================================
+    // COLUNA 1: ATRIBUTOS E FRAGMENTOS
+    // ==========================================
     draw_set_color(c_yellow);
     draw_text(_col1_x, _linha_y, get_text("status_titulo_atributos"));
     draw_set_color(c_white);
@@ -247,12 +249,59 @@ desenha_aba_status = function(_inv_x, _inv_w, _cont_y, _cont_h)
     draw_text(_col1_x, _atr_y, get_text("status_velocidade") + ": " + string(global.velh_calculada)); _atr_y += _espaco_linhas;
     draw_text(_col1_x, _atr_y, get_text("status_slots") + ": " + string(global.player_slots_maximos)); _atr_y += _espaco_linhas * 1.5;
     
+    // --- SEÇÃO DE FRAGMENTOS (TRADUZIDA) ---
+    draw_set_color(c_yellow);
+    draw_text(_col1_x, _atr_y, get_text("status_fragmentos"));
+    draw_set_color(c_white);
+    _atr_y += _espaco_linhas;
+    
+    var _alt_centro = string_height("M") / 2;
+    
+    // Fragmentos de Vida
+    var _frag_vida_atual = global.fragmentos_vida mod global.fragmentos_por_ponto;
+    var _str_vida = get_text("status_frag_vida");
+    draw_text(_col1_x, _atr_y, _str_vida);
+    
+    // Calcula a largura dinâmica da palavra traduzida
+    var _icon_x = _col1_x + string_width(_str_vida) + 15;
+    var _escala_icon = 1.5; 
+    
+    for (var i = 0; i < global.fragmentos_por_ponto; i++) 
+    {
+        var _tem_fragmento = (i < _frag_vida_atual);
+        var _cor = _tem_fragmento ? c_white : c_black;
+        var _alpha = _tem_fragmento ? 1.0 : 0.3;
+        
+        draw_sprite_ext(spr_fragmento_vida, 0, _icon_x + (i * 35), _atr_y + _alt_centro, _escala_icon, _escala_icon, 0, _cor, _alpha);
+    }
+    _atr_y += _espaco_linhas;
+    
+    // Fragmentos de Foco (Tempo)
+    var _frag_tempo_atual = global.fragmentos_tempo mod global.fragmentos_tempo_por_ponto;
+    var _str_foco = get_text("status_frag_foco");
+    draw_text(_col1_x, _atr_y, _str_foco);
+    
+    var _icon_x2 = _col1_x + string_width(_str_foco) + 15;
+    
+    for (var i = 0; i < global.fragmentos_tempo_por_ponto; i++) 
+    {
+        var _tem_fragmento = (i < _frag_tempo_atual);
+        var _cor = _tem_fragmento ? c_white : c_black;
+        var _alpha = _tem_fragmento ? 1.0 : 0.3;
+        
+        draw_sprite_ext(spr_fragmento_tempo, 0, _icon_x2 + (i * 35), _atr_y + _alt_centro, _escala_icon, _escala_icon, 0, _cor, _alpha);
+    }
+    _atr_y += _espaco_linhas * 1.5;
+    
+    // Tempo de jogo
     var _t = global.tempo_de_jogo_segundos;
     var _str_tempo = string(_t div 3600) + "h " + (((_t mod 3600) div 60) < 10 ? "0" : "") + string((_t mod 3600) div 60) + "m " + ((_t mod 60) < 10 ? "0" : "") + string(_t mod 60) + "s";
     draw_set_color(c_gray);
     draw_text(_col1_x, _atr_y, get_text("status_tempo") + ": " + _str_tempo);
     
-    // Coluna 2: Habilidades
+    // ==========================================
+    // COLUNA 2: HABILIDADES
+    // ==========================================
     draw_set_color(c_yellow);
     draw_text(_col2_x, _linha_y, get_text("status_titulo_habilidades"));
     
@@ -268,9 +317,31 @@ desenha_aba_status = function(_inv_x, _inv_w, _cont_y, _cont_h)
         _hab_y += _espaco_linhas;
     }
     
+    // Linha divisória central
     draw_set_color(c_gray); draw_set_alpha(0.3);
-    draw_line(_meio_x, _linha_y, _meio_x, _hab_y);
+    draw_line(_meio_x, _linha_y, _meio_x, max(_atr_y, _hab_y)); 
     draw_set_alpha(1.0);
+
+    // ==========================================
+    // CARTEIRA DE DINHEIRO (Canto Inferior Direito)
+    // ==========================================
+    draw_set_halign(fa_right); 
+    draw_set_valign(fa_bottom); 
+    draw_set_color(c_white);
+    
+    var _str_dinheiro = string(global.dinheiro);
+    var _din_x = _inv_x + _inv_w - _margem; 
+    var _din_y = _cont_y + _cont_h;         
+    
+    draw_text(_din_x, _din_y, _str_dinheiro);
+    
+    if (sprite_exists(spr_dinheiro)) 
+    {
+        var _w = string_width(_str_dinheiro);
+        var _escala_moeda = 1.5;
+        
+        draw_sprite_ext(spr_dinheiro, 0, _din_x - _w - 15, _din_y - (_alt_centro), _escala_moeda, _escala_moeda, 0, c_white, 1);
+    }
 }
 
 desenha_aba_bestiario = function(_area_x, _cont_y, _area_w, _cont_h, _area_desc_x, _area_desc_w)
@@ -490,7 +561,7 @@ desenha_aba_listas = function(_area_x, _cont_y, _area_w, _cont_h)
     draw_surface(surf_items, _area_x, _cont_y);
 }
 
-desenha_painel_info = function(_desc_x, _desc_w, _cont_y)
+desenha_painel_info = function(_desc_x, _desc_w, _cont_y, _cont_h)
 {
     var _sel = undefined;
     if (current_tab == INVENTARIO_TAB.AMULETOS) _sel = global.inventario[# cursor_col, cursor_row];
@@ -516,10 +587,35 @@ desenha_painel_info = function(_desc_x, _desc_w, _cont_y)
                  if (_q > 1) _desc += "\n(x" + string(_q) + ")";
             }
             draw_text_ext(_desc_x + _desc_w/2, _cont_y + 160, _desc, 20, _desc_w);
+
+            // =======================================================
+            // INPUT PARA EQUIPAR (Canto Inferior Direito do Painel)
+            // =======================================================
+            if (current_tab == INVENTARIO_TAB.AMULETOS and is_struct(_sel)) 
+            {
+                var _str_equipar = get_text("inv_equipar");
+                
+                var _escala_icon = 2.0; // <-- Aumentamos bem o tamanho do botão!
+                var _text_w = string_width(_str_equipar);
+                
+                // Ancorando no canto direito do painel de descrição (-20 de margem)
+                var _prompt_x = _desc_x + _desc_w - 20; 
+                var _prompt_y = _cont_y + _cont_h - 20; // Fundo do painel
+                
+                // Desenha o texto alinhado pela direita
+                draw_set_halign(fa_right); 
+                draw_set_valign(fa_middle);
+                draw_text(_prompt_x, _prompt_y, _str_equipar);
+                
+                // Acha a posição X ideal para o botão (Texto + Margem segura)
+                // Usamos a proporção da escala pra não encavalar
+                var _dist_botao = _text_w + (20 * _escala_icon); 
+                
+                desenha_input_verbo(INPUT_VERB.JUMP, _prompt_x - _dist_botao, _prompt_y, _escala_icon);
+            }
         }
     }
 }
-
 
 // ==============================================================
 //             RENDERIZAÇÃO PRINCIPAL (FICOU ENXUTA!)
@@ -561,7 +657,6 @@ desenha_inventario = function()
         desenha_aba_listas(_area_itens_x, _cont_y, _area_itens_w, _cont_h);
     }
     else if (current_tab == INVENTARIO_TAB.BESTIARIO) {
-        // --- CHAMA O BESTIÁRIO AQUI ---
         desenha_aba_bestiario(_area_itens_x, _cont_y, _area_itens_w, _cont_h, _area_desc_x, _area_desc_w);
     }
     else if (current_tab == INVENTARIO_TAB.STATUS) {
@@ -574,7 +669,8 @@ desenha_inventario = function()
     
     // 3. Painel de Informações Lateral (se for aba de itens)
     if (current_tab == INVENTARIO_TAB.AMULETOS or current_tab == INVENTARIO_TAB.ITENS or current_tab == INVENTARIO_TAB.MELHORIAS or current_tab == INVENTARIO_TAB.ESSENCIAS) {
-        desenha_painel_info(_area_desc_x, _area_desc_w, _cont_y);
+        // Agora passamos o _cont_h também!
+        desenha_painel_info(_area_desc_x, _area_desc_w, _cont_y, _cont_h);
     }
     
     draw_set_halign(-1); draw_set_valign(-1); draw_set_font(-1); draw_set_color(c_white);

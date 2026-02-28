@@ -9,23 +9,38 @@ adicionar_produto = function(_tipo, _id_referencia, _preco)
     
     var _nome = "", _desc = "", _spr = noone;
     
-    if (_tipo == "item") 
+    // --- DEFINIÇÃO DOS PRODUTOS VIA SWITCH ---
+    switch (_tipo) 
     {
-        var _info = global.db_itens_info[$ _id_referencia]; 
-        if (_info != undefined) {
-            _nome = get_text(_info.nome_key);
-            _desc = get_text(_info.desc_key);
-            _spr  = _info.spr;
-        }
-    } 
-    else if (_tipo == "amuleto") 
-    {
-        var _amuleto = global.amuletos[| _id_referencia]; 
-        if (_amuleto != undefined) {
-            _nome = get_text(_amuleto.nome_key);
-            _desc = get_text(_amuleto.desc_key);
-            _spr  = _amuleto.spr;
-        }
+        case "item":
+            var _info = global.db_itens_info[$ _id_referencia]; 
+            if (_info != undefined) {
+                _nome = get_text(_info.nome_key);
+                _desc = get_text(_info.desc_key);
+                _spr  = _info.spr;
+            }
+            break;
+            
+        case "amuleto":
+            var _amuleto = global.amuletos[| _id_referencia]; 
+            if (_amuleto != undefined) {
+                _nome = get_text(_amuleto.nome_key);
+                _desc = get_text(_amuleto.desc_key);
+                _spr  = _amuleto.spr;
+            }
+            break;
+            
+        case "fragmento":
+            _nome = get_text("item_frag_vida_nome"); 
+            _desc = get_text("item_frag_vida_desc");
+            _spr  = spr_fragmento_vida; 
+            break;
+            
+        case "fragmento_tempo":
+            _nome = get_text("item_frag_foco_nome"); 
+            _desc = get_text("item_frag_foco_desc");
+            _spr  = spr_fragmento_tempo; 
+            break;
     }
     
     array_push(produtos, {
@@ -49,7 +64,8 @@ if (variable_instance_exists(id, "estoque_recebido"))
     }
 }
 
+// TEXTO "ESGOTADO" TRADUZIDO
 if (array_length(produtos) == 0) 
 {
-    array_push(produtos, { nome: "Esgotado", desc: "Já comprei tudo...", preco: 0, spr: noone, tipo: "none" });
+    array_push(produtos, { nome: get_text("loja_esgotado_nome"), desc: get_text("loja_esgotado_desc"), preco: 0, spr: noone, tipo: "none" });
 }

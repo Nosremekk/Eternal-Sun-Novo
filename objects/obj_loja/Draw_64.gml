@@ -23,9 +23,9 @@ draw_sprite_stretched(spr_dialog_box, 0, _x, _y, _box_w * anim_escala, _box_h * 
 draw_set_font(fnt_dialogo); // Use sua fonte de UI
 draw_set_valign(fa_top);
 
-// Dinheiro do Player (Topo Direito)
+// Dinheiro do Player (Topo Direito) - TRADUZIDO
 draw_set_halign(fa_right);
-draw_text_transformed(_x + _box_w * anim_escala - (30*_s), _y + (30*_s), "Dinheiro: " + string(global.dinheiro), _s, _s, 0);
+draw_text_transformed(_x + _box_w * anim_escala - (30*_s), _y + (30*_s), get_text("loja_dinheiro") + string(global.dinheiro), _s, _s, 0);
 
 draw_set_halign(fa_left);
 
@@ -57,7 +57,7 @@ var _selecionado = produtos[index_selecionado];
 
 if (_selecionado.tipo != "none") 
 {
-    // NOVIDADE: Desenha o Ícone centralizado independentemente da Origin
+    // Desenha o Ícone centralizado independentemente da Origin
     if (sprite_exists(_selecionado.spr)) {
         var _escala_spr = _s * 2.5; // Um pouco maior para destaque
         
@@ -78,21 +78,21 @@ if (_selecionado.tipo != "none")
         draw_sprite_ext(_selecionado.spr, 0, _draw_x, _draw_y, _escala_spr, _escala_spr, 0, c_white, 1);
     }
     
-    // Textos do item (mantive igual)
+    // Textos do item
     draw_set_color(c_yellow);
     draw_text_transformed(_detalhe_x, _detalhe_y + (150*_s), _selecionado.nome, _s, _s, 0);
     draw_set_color(c_white);
     draw_text_ext_transformed(_detalhe_x, _detalhe_y + (200*_s), _selecionado.desc, 30*_s, (_box_w/2 - 60*_s), _s*0.8, _s*0.8, 0);
 }
 
-// --- RODAPÉ COM BOTÕES MAIORES ---
+// --- RODAPÉ COM BOTÕES MAIORES E TRADUZIDOS ---
 var _rodape_y = _y + _box_h - (50 * _s); // Subi um pouco para caber o botão maior
 var _escala_btn = _s * 1.5; // Escala extra para os botões e texto
 
 desenha_input_verbo(INPUT_VERB.JUMP, _x + (60 * _s), _rodape_y, _escala_btn);
-draw_text_transformed(_x + (100 * _s), _rodape_y - (10 * _s), "Comprar", _s, _s, 0);
+draw_text_transformed(_x + (100 * _s), _rodape_y - (10 * _s), get_text("loja_comprar"), _s, _s, 0);
 
 desenha_input_verbo(INPUT_VERB.DASH, _x + (280 * _s), _rodape_y, _escala_btn);
-draw_text_transformed(_x + (320 * _s), _rodape_y - (10 * _s), "Sair", _s, _s, 0);
+draw_text_transformed(_x + (320 * _s), _rodape_y - (10 * _s), get_text("loja_sair"), _s, _s, 0);
 
 draw_set_font(-1);

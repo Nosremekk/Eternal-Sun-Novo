@@ -122,5 +122,21 @@
     "hab_combo": "Combo Master",
     "hab_float": "Float",
     "hab_mark": "Spectral Mark",
-    "ui_bestiario_get": "RESEARCH COMPLETE"
+    "ui_bestiario_get": "RESEARCH COMPLETE",
+    "npc_mercador": "Luci No",
+    "loja_boas_vindas_1": "Welcome to my camelô!",
+    "loja_boas_vindas_2": "Take a look at my bagulhos.",
+    "loja_dinheiro": "Money: ",
+    "loja_comprar": "Buy",
+    "loja_sair": "Leave",
+    "loja_esgotado_nome": "Sold Out",
+    "loja_esgotado_desc": "I've bought everything...",
+    "item_frag_vida_nome": "Life Fragment",
+    "item_frag_vida_desc": "Collect 4 fragments to permanently increase your Max Health.",
+    "item_frag_foco_nome": "Focus Shard",
+    "item_frag_foco_desc": "Collect 3 shards to increase your Combo tolerance time by 3 seconds.",
+    "status_fragmentos": "COLLECTED FRAGMENTS",
+    "status_frag_vida": "Health: ",
+    "status_frag_foco": "Focus: ",
+    "inv_equipar": "Equip / Unequip"
 }

@@ -32,9 +32,16 @@ global.dano      = 1; // Dano final
 
 //Combate e Combo
 global.combo = 1;
-global.limite_combo = 6;
+global.limite_combo = 8;
 global.dano_combo = 2;
-global.timer_combo = 10; // Segundos
+// Sistema do Timer de Combo
+global.timer_combo_base = 15;          // NOVO: O tempo inicial (imutável)
+global.timer_combo = 15;               // O tempo atual (Base + Fragmentos)
+
+// Fragmentos de Tempo (Combo)
+global.fragmentos_tempo = 0;           
+global.fragmentos_tempo_por_ponto = 3; 
+global.timer_combo_memoria = 15;       
 
 //Capitalismo
 global.dinheiro = 0; 
@@ -65,6 +72,24 @@ function atualiza_stats_player()
     
     // Salva na memória para a próxima checagem
     global.vida_permanente_memoria = _nova_vida_permanente;
+    
+
+    // 1.5 CALCULA O NOVO TEMPO DE COMBO (Base + Fragmentos)
+    // --------------------------------------------------------
+    var _bonus_tempo = floor(global.fragmentos_tempo / global.fragmentos_tempo_por_ponto);
+    
+    // AQUI ESTÁ O SEGREDO: Multiplicamos o bônus por 3
+    var _novo_timer_combo = global.timer_combo_base + (_bonus_tempo * 3);
+    
+    // Se o tempo permanente AUMENTOU (completou os 3 fragmentos)
+    if (_novo_timer_combo > global.timer_combo_memoria) 
+    {
+        // TODO: Tocar Efeito Sonoro indicando o upgrade
+    }
+    
+    // Aplica e salva na memória
+    global.timer_combo_memoria = _novo_timer_combo;
+    global.timer_combo = _novo_timer_combo;
 
     // --------------------------------------------------------
     // 2. PREPARA OS STATS PARA RECEBER OS AMULETOS
@@ -253,13 +278,26 @@ function reset_variaveis_jogo()
     global.velh_base      = 5;
     global.velh_calculada = 5;
     
+    
     global.dano_base = 1;
     global.dano      = 1; 
+    
+    //Combate e Combo
+    global.combo = 1;
+    global.limite_combo = 8;
+    global.dano_combo = 2;
+    // Sistema do Timer de Combo
+    global.timer_combo_base = 15;         
+    global.timer_combo = 15;             
+    
+    global.fragmentos_tempo = 0;           
+    global.fragmentos_tempo_por_ponto = 3; 
+    global.timer_combo_memoria = 15;       
+
     
     global.player_slots_maximos = 3; 
     global.player_slots_usados = 0;
     
-    global.combo = 1;
     global.vida_player_transicao = -1;
     global.xscale_player_transicao = 0;
     global.player_nasce_invencivel = false;

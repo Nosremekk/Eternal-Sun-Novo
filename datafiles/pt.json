@@ -122,5 +122,21 @@
     "hab_combo": "Mestre do Combo",
     "hab_float": "Flutuar",
     "hab_mark": "Marca Espectral",
-    "ui_bestiario_get": "PESQUISA CONCLUÍDA"
+    "ui_bestiario_get": "PESQUISA CONCLUÍDA",
+    "npc_mercador": "Luciano Moraes",
+    "loja_boas_vindas_1": "Bem-vindo à minha coisa",
+    "loja_boas_vindas_2": "Dê uma olhada nas minhas coisas",
+    "loja_dinheiro": "Dinheiro: ",
+    "loja_comprar": "Comprar",
+    "loja_sair": "Sair",
+    "loja_esgotado_nome": "Esgotado",
+    "loja_esgotado_desc": "Já comprei tudo...",
+    "item_frag_vida_nome": "Fragmento de Vida",
+    "item_frag_vida_desc": "Junte 4 fragmentos para aumentar permanentemente a sua Vida Máxima.",
+    "item_frag_foco_nome": "Pedaço de Foco",
+    "item_frag_foco_desc": "Junte 3 pedaços para aumentar o tempo de tolerância do seu Combo em 3 segundos.",
+    "status_fragmentos": "FRAGMENTOS COLETADOS",
+    "status_frag_vida": "Vida: ",
+    "status_frag_foco": "Foco: ",
+    "inv_equipar": "Equipar / Desequipar"
 }
