@@ -12,6 +12,8 @@ if (_xscale_anterior != xscale) and (abs(velh) > 0.5) and (chao)
     cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 3);
 }
 
+escala_x = lerp(escala_x, 1, 0.25);
+escala_y = lerp(escala_y, 1, 0.25);
 roda_estado(); //Se começar a bugar lembrar de passar isso pra dps da colisao
 
 // Colisão

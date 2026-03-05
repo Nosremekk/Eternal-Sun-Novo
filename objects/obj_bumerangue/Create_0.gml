@@ -1,4 +1,3 @@
-// Herda variáveis do obj_hit (se houver)
 event_inherited();
 
 pai = noone;

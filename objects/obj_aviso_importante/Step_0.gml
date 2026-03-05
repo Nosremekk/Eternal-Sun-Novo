@@ -5,7 +5,7 @@ var _inputs = controles_menu();
 
 switch (estado_item)
 {
-    case 0: // Fade In e "Pop" do item
+    case 0:
         alpha = lerp(alpha, 1, 0.1);
         escala_item = lerp(escala_item, 1, 0.15); 
         
@@ -16,11 +16,11 @@ switch (estado_item)
         }
         break;
 
-    case 1: // Esperando o jogador ler e apertar o botão
+    case 1: 
         if (_inputs.confirma or _inputs.voltar_btn or _inputs.aplica_pause) {
             estado_item = 2;
             InputVerbConsumeAll();
-            // efeito_sonoro(snd_menu_fechar, 50, 0);
+            efeito_sonoro(sfx_menu_click, 50, 0);
         }
         break;
 

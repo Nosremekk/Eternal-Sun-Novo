@@ -7,17 +7,23 @@ inv_timer = 0;
 duracao_inv = .4;
 
 xscale = image_xscale
+//Para controle de achatar e etc
+escala_x = 1;
+escala_y = 1;
+
+//Animação
 img_ind = 0;
 image_speed = 0;
 anim_speed = 8;
 
+//Velocidade
 velh =     0;
 velv =     0;
 max_velv = 0;
 max_velh = 0;
 chao = noone;
 grav = .3;
-
+//Colisao
 colisao_tile_map = layer_tilemap_get_id("Colisao_Tiles");
 colisor = [obj_colisor,obj_parede_secreta,colisao_tile_map]
 
@@ -81,12 +87,14 @@ function recebe_dano(_dano = 1)
 {
     if (inv) exit;
     vida_atual -= _dano;
-    //Garantindo que a vida atual não fique abaixo de zero
-    vida_atual = clamp(vida_atual,0,vida_max);
+    vida_atual = clamp(vida_atual, 0, vida_max);
+    
+    // Squash de impacto
+    escala_x = 1.15;
+    escala_y = 0.85;
     
     troca_estado(estado_hurt);
     
-    //Morrendo caso a vida <= 0
     if (vida_atual <= 0)
     {
         instance_destroy();

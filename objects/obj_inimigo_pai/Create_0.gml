@@ -120,6 +120,10 @@ function recebe_dano(_dano = 1)
     vida_atual -= _dano;
     vida_atual = clamp(vida_atual, 0, vida_max);
     
+    // Squash de impacto
+    escala_x = 2;
+    escala_y = .5;
+    
     var _centro_y = y - (sprite_height / 2);
      
     // --- ALTERAÇÃO AQUI: Sangue Dinâmico ---

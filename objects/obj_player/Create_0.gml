@@ -53,6 +53,7 @@ dir_atk = noone;
 desliza_hit = false;
 atacando_parede = false;
 duracao_inv = 1.25;
+trava_xscale = false;
 
 //Magias
 tipo_magia = noone;
@@ -252,6 +253,8 @@ movimento_vertical = function()
     // Executa pulo se puder
     if (timer_queda > 0 and (chao or timer_pulo > 0)) {
         velv = -max_velv;
+        escala_x = 0.85;
+        escala_y = 1.15;
         
         var _plat = instance_place(x, y + 2, obj_plataforma_movel);
         if (_plat != noone and _plat.vsp < 0) 
@@ -351,6 +354,10 @@ colisao = function()
                  if (abs(velh) > 0.1) troca_estado(estado_walk);
                  else troca_estado(estado_idle);
             }
+            
+            escala_x = 1.15;
+            escala_y = 0.85;
+                
         }
         tempo_queda_livre = 0;
     }
@@ -447,7 +454,10 @@ verifica_espinho = function()
 ajusta_xscale_player = function()
 {
     if (timer_recuo_ataque > 0) exit;
-    if (estado_atual == estado_attack) and (atacando_parede) exit;    
+    if (estado_atual == estado_attack) and (atacando_parede) exit;
+    if (estado_atual == estado_attack) and (trava_xscale) exit; //Faço isso pra evitar bate na parede estando no ar e girar        
+        
+    trava_xscale = false;    
         
     if (abs(velh) > .5)
     {
@@ -483,6 +493,7 @@ aplicar_recuo_ataque = function(_forca_extra = 0, _eh_parede = false)
     // Aplica
     velh = _vel_final;
     timer_recuo_ataque = .3; 
+    trava_xscale = true;
 }
 
 aplicar_recuo_parede = function()
@@ -818,6 +829,9 @@ alarme_vida = function()
 // Função para executar pogo
 aplicar_pogo = function(_inimigo = false)
 {
+    escala_x = 0.85;
+    escala_y = 1.15;
+    
     // Só funciona se estiver atacando para baixo
     if (dir_atk != "vertical_down") exit;
 
@@ -991,6 +1005,9 @@ estado_jump.roda = function()
             velv = -max_velv;
             velh = (lado_atual == 0) ? -max_velh : max_velh;
             
+            escala_x = 0.85;
+            escala_y = 1.15;
+            
             timer_pulo  = 0;
             timer_queda = 0;
             timer_parede = 0; // Mata o Coyote Time instantaneamente
@@ -1017,6 +1034,8 @@ estado_jump.roda = function()
     {
         velv = -max_velv;
         jump_extra_left--;
+        escala_x = 0.85;
+        escala_y = 1.15;
         timer_pulo  = 0;    
         timer_queda = 0; 
         cria_particula(x, bbox_bottom, TIPO_PARTICULA.SHOCKWAVE, 1);
@@ -1065,6 +1084,9 @@ estado_dash.inicia = function()
 {
     sprite = spr_player_dash;
     image_index  = 0;
+    
+    escala_x = 1.15;
+    escala_y = 0.85;
     
 
     if (dir == 90 or dir == 270) desconta_dura_dash = dura_dash * 0.7;
@@ -1226,6 +1248,9 @@ estado_attack.inicia = function()
     image_index = 0; 
     bateu_parede = false;
     
+    escala_x = 1.1;
+    escala_y = 0.92;
+    
     atacando_parede = false; 
 
     if (!chao) and (global.powerups[powerup.WALL]) // Só se tiver powerup
@@ -1333,6 +1358,9 @@ estado_hurt.inicia = function()
     inv = true;
     inv_timer = 0; 
     timer_stun = 0.3; 
+    
+    escala_x = 1.15;
+    escala_y = 0.85;
     
     InputVibrateConstant(0.8, 0, 350);
     aplica_screenshake();
