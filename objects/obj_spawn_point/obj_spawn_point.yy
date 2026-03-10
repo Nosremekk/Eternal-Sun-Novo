@@ -1,9 +1,9 @@
 {
   "$GMObject":"",
-  "%Name":"obj_cam_regiao",
+  "%Name":"obj_spawn_point",
   "eventList":[],
   "managed":true,
-  "name":"obj_cam_regiao",
+  "name":"obj_spawn_point",
   "overriddenProperties":[],
   "parent":{
     "name":"colisoes e hitbox",
@@ -28,8 +28,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_transicao",
-    "path":"sprites/spr_transicao/spr_transicao.yy",
+    "name":"spr_hit",
+    "path":"sprites/spr_hit/spr_hit.yy",
   },
   "spriteMaskId":null,
   "visible":false,

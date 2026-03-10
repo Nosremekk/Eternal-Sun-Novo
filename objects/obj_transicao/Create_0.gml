@@ -8,6 +8,8 @@ controlar_transicao = function()
 {
     var _player = instance_place(x, y, obj_player);
     
+    if (instance_exists(obj_encontro)) exit; //Caso tenha um encontro na area eu apenas nao faço nada e deixo o player preso
+    
     if (shake_timer > 0) shake_timer -= desconta_timer();
 
     if (_player and !ativado)

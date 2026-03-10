@@ -9,7 +9,7 @@ global.target_y = noone;
 
 depth = -999999;
 
-//Verificando se existe obj_inventario
+//Verificando se existe inventario
 if (instance_exists(obj_inventario))
 {
     instance_destroy(obj_inventario)

@@ -1,20 +1,17 @@
 {
   "$GMObject":"",
-  "%Name":"obj_entidade",
+  "%Name":"obj_encontro",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":4,"eventType":7,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":10,"eventType":2,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"obj_entidade",
+  "name":"obj_encontro",
   "overriddenProperties":[],
   "parent":{
-    "name":"entidades",
-    "path":"folders/Objects/entidades.yy",
+    "name":"controladores",
+    "path":"folders/Objects/controladores.yy",
   },
   "parentObjectId":null,
   "persistent":false,
@@ -34,7 +31,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"spr_cenario_interativo",
+    "path":"sprites/spr_cenario_interativo/spr_cenario_interativo.yy",
+  },
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }

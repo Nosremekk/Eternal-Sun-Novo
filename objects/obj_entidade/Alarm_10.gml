@@ -1,0 +1,1 @@
+verificacao_luz();

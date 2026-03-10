@@ -7,11 +7,9 @@ hud_alpha  = 0;
 talk = false;
 morto = false;
 
-// --- NOVO: MULTIPLICADOR DE ESCALA (Porcentagem) ---
-// 1.0 = 100% (Tamanho Original). 0.7 = 70% do tamanho. Ajuste como preferir!
+
 hud_escala_mult = 0.7; 
 
-// Refs globais (Agora pega direto da global)
 vida_anterior = global.vida_atual;
 combo_anterior = 0;
 
@@ -93,8 +91,8 @@ controla_alpha_hud = function()
 pausando = function()
 {
     if (morto or talk) exit;
+    if (obj_transicao_mestre.mode != "idle") exit;
     
-    // NOVO: Agrupa todas as telas que "congelam" o jogo em uma variável só
     var _outros_menus = global.abre_inventario or instance_exists(obj_loja) or instance_exists(obj_aviso_importante);
     
     if (InputPressed(INPUT_VERB.PAUSE) and !_outros_menus)

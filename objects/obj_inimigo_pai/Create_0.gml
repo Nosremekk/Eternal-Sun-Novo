@@ -3,6 +3,13 @@
 
 // Inherit the parent event
 event_inherited();
+verifica_luz = false
+
+if (!variable_instance_exists(id, "spawnado_por_encontro")) {
+    spawnado_por_encontro = false;
+}
+
+
 //Ja fui morto?
 inimigo_key = noone;
 boss_key = noone;
@@ -11,7 +18,7 @@ meu_id_bestiario = "";
 if (!e_boss) 
 {
     inimigo_key = get_inimigo_key();
-    if (variable_struct_exists(global.inimigos_mortos_temp, inimigo_key))
+    if (!spawnado_por_encontro and variable_struct_exists(global.inimigos_mortos_temp, inimigo_key))
     {
         instance_destroy();
         exit; 
@@ -19,14 +26,13 @@ if (!e_boss)
 }
 else 
 { 
-    boss_key = get_inimigo_key(); 
-
-    if (variable_struct_exists(global.bosses_mortos, boss_key))
+    boss_key = get_inimigo_key();
+    // Trava do encontro para boss
+    if (!spawnado_por_encontro and variable_struct_exists(global.bosses_mortos, boss_key))
     {
-    instance_destroy(); 
-    exit; 
+        instance_destroy(); 
+        exit; 
     }
-    
 }
 
 
@@ -126,9 +132,7 @@ function recebe_dano(_dano = 1)
     
     var _centro_y = y - (sprite_height / 2);
      
-    // --- ALTERAÇÃO AQUI: Sangue Dinâmico ---
-    // Base: 4 partículas
-    // Extra: +3 partículas por nível de combo
+
     var _qtd_sangue = 4 + (global.combo * 3);
     
     // Opcional: Limitar para não travar o pc se o combo for infinito (ex: max 40 particulas)
@@ -176,11 +180,14 @@ function recebe_dano(_dano = 1)
     //Morrendo caso a vida <= 0
     if (vida_atual <= 0)
     {
-        if (!e_boss) global.inimigos_mortos_temp[$ inimigo_key] = true; 
-        else 
-        { 
-            global.bosses_mortos[$ boss_key] = true
-            salvando_jogo(global.save,false);
+        if (!spawnado_por_encontro)
+        {
+            if (!e_boss) global.inimigos_mortos_temp[$ inimigo_key] = true;
+            else 
+            { 
+                global.bosses_mortos[$ boss_key] = true
+                salvando_jogo(global.save,false);
+            }
         }
         
         if (global.inimigo_marcado == id)
@@ -227,3 +234,4 @@ if (variable_struct_exists(global.bosses_mortos, key_boss_requerido))
     abrir_porta();
 }
  * */
+
