@@ -5,6 +5,7 @@ global.ystart = 0;
 
 //Controle
 global.pause = false;
+global.descansando = false;
 
 //Tempo
 global.vel_scale = 1;
@@ -335,6 +336,7 @@ function reset_variaveis_jogo()
     // Reset Variáveis de Controle
     global.dados_load_pendente = undefined;
     global.timer_icone_save = 0;
+    global.descansando = false;
     
     //Reset capital
     global.dinheiro = 0;

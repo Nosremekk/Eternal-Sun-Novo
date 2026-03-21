@@ -125,6 +125,14 @@ function cria_amuleto(_nome_key, _desc_key, _spr, _tipo_efeito, _valor_efeito, _
     // --- MÉTODO PRINCIPAL DE TROCA ---
     alterna_equipamento = function()
     {
+        if (!global.descansando)
+        {
+            InputVibrateConstant(0.4, 0.0, 150)
+            efeito_sonoro(sfx_error, 60, 0.1);
+            
+            return; //Paro de ler o codigo se nao estou na bonfire
+        }
+        
         if (equipado)
         {
             // DESEQUIPAR

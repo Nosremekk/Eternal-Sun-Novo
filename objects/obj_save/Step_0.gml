@@ -5,15 +5,14 @@ interagiu = (_player != noone);
 if (interagiu)
 {
 
-    if (InputPressed(btn_interage) and timer_save <= 0) 
+    if (InputPressed(btn_interage) and timer_save <= 0 and _player.estado_atual != _player.estado_rest and _player.chao) 
     {
+        with(_player) troca_estado(estado_rest);
 
         global.vida_atual = global.vida_max; 
         
-        if (instance_exists(obj_player))
-        {
-            restart_powerups(); 
-        }
+        restart_powerups(); 
+        
         
 
         global.inimigos_mortos_temp = {};

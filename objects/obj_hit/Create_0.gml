@@ -1,4 +1,4 @@
-lista_livre = [];
+init_dano();
 dano = global.dano;
 
 

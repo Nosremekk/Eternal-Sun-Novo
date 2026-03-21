@@ -128,6 +128,7 @@ estado_float = new estado();
 estado_wakeup = new estado();
 estado_land = new estado();
 estado_magic = new estado();
+estado_rest = new estado();
 
 //Camera
 instancia_camera = function()
@@ -1323,6 +1324,52 @@ estado_attack.roda = function()
             if (_morte.recupera_combo) adiciona_combo();
             _morte.tempo_pogo = .35;
         }
+        
+        var _vida = instance_place(hitbox.x, hitbox.y, obj_cura);
+                
+        if (_vida != noone)
+        {
+            aplicar_pogo();
+            
+            var _qtd_recuperar = 0;
+            var _hit_desconto = 1;
+            
+            // Verifica se a cura atingida é a que está marcada
+            if (global.inimigo_marcado == _vida.id)
+            {
+                // Recupera 100% do limite de combo
+                _qtd_recuperar = global.limite_combo;
+                _hit_desconto = 2;
+                
+                global.inimigo_marcado = noone;
+                global.timer_marcado = 0;
+                
+                // Adicione um efeito sonoro ou partícula extra aqui se quiser dar mais peso!
+            }
+            else
+            {
+                // Recupera apenas 50% do limite
+                _qtd_recuperar = round(global.limite_combo / 2);
+            }
+            
+            // Aplica o combo chamando a sua função para manter o Juice (vibração/hitstop)
+            repeat(_qtd_recuperar)
+            {
+                adiciona_combo();
+            }
+            
+            if (!_vida.infinito) _vida.hits_cura -= _hit_desconto;
+    
+            // Se acabaram os hits da cura
+            if (_vida.hits_cura <= 0)
+            {
+                // Muito Juice! Partículas espirrando e som de quebra/impacto
+                cria_particula(_vida.x, _vida.y, TIPO_PARTICULA.COLETAVEL, 15, 0, 360);
+                efeito_sonoro(sfx_wallhit, 70, 0.1); 
+                
+                instance_destroy(_vida);
+            }
+        }
     }
     
     //Saindo do estado de ataque
@@ -1774,7 +1821,36 @@ estado_magic.finaliza = function()
     tipo_magia = noone;
 }
 
+estado_rest.inicia = function()
+{
+    sprite = spr_player_idle;
+    image_index = 0;
+    velh = 0;
+    velv = 0;
+    
+    InputVerbConsumeAll();
+    global.descansando = true;
+}
 
+estado_rest.roda = function()
+{
+    checando_chao();
+    movimento_vertical();
+    velh = 0;
+    
+    if (jump or dash or left or right)
+    {
+        troca_estado(estado_idle);
+    }
+}
+
+estado_rest.finaliza = function()
+{
+    global.descansando = false;
+    global.vida_atual = global.vida_max;
+    salvando_jogo(global.save, true);
+    cria_particula(x, y, TIPO_PARTICULA.ALMA, 3);
+}
 
 inicia_estado(estado_idle);
 instancia_camera();
