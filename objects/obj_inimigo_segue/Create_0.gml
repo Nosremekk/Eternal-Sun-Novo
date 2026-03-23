@@ -54,6 +54,7 @@ estado_run.finaliza = function()
     
 }
 
+inicia_morte_inimigo();
 //Aplicando knockback
 inicia_knock();
 

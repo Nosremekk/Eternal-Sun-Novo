@@ -4,7 +4,7 @@
 // Inherit the parent event
 event_inherited();
 
-formulario_inimigo(3,1,4,,,.3,250,0);
+formulario_inimigo(3,1,4,,,.3,250,0,true,sprite_index);
 
 
 meu_id_bestiario = "inimigo_anda";
@@ -34,7 +34,7 @@ estado_walk.finaliza = function()
     
 }
 
-
+inicia_morte_inimigo();
 //Aplicando knockback
 inicia_knock();
 

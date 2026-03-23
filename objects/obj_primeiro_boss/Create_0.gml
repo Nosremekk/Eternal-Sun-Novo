@@ -250,7 +250,7 @@ estado_fly.finaliza = function()
 
 
 
-
+inicia_morte_inimigo();
 
 //Iniciando a state machine
 //Iniciando o meu boss

@@ -81,7 +81,7 @@ estado_dash.finaliza = function()
 }
 
 
-
+inicia_morte_inimigo();
 inicia_knock_wait()
 
 //Iniciando state machine

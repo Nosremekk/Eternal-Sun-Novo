@@ -106,6 +106,7 @@ estado_ataque.finaliza = function()
     timer_atk = 0;
 }
 
+inicia_morte_inimigo();
 inicia_knock_wait(2,estado_walk,,,true);
 
 

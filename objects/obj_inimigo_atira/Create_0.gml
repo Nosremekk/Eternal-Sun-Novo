@@ -56,6 +56,7 @@ estado_shot.finaliza = function()
 
 }
 
+inicia_morte_inimigo();
 inicia_knock();
 //Iniciando state machine
 inicia_estado(estado_walk);

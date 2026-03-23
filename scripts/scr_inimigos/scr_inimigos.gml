@@ -1,5 +1,5 @@
 //Formulario de inimigo(variaveis padroes de cada um)
-function formulario_inimigo(_vida = 5,_max_velh = 1,_max_velv = 4,_velh = 0,_velv = 0,_grav = .3,_xmax = 300,_ymax = 0)
+function formulario_inimigo(_vida = 5,_max_velh = 1,_max_velv = 4,_velh = 0,_velv = 0,_grav = .3,_xmax = 300,_ymax = 0,_tem_morte = false, _spr_morte = noone)
 {
     vida_max = _vida;
     vida_atual = vida_max;
@@ -11,6 +11,8 @@ function formulario_inimigo(_vida = 5,_max_velh = 1,_max_velv = 4,_velh = 0,_vel
     grav = _grav;
     x_max = _xmax;
     altura_max = _ymax;
+    tem_morte = _tem_morte;
+    spr_morto = _spr_morte; 
 }
 
 //Função para criar o estado de knockout caso o inimigo sofra disso. Apenas chamar ela após criar a logica de todos os estados
@@ -80,13 +82,15 @@ function inicia_knock_wait(_duracao_knock = 1,_retorna_estado = estado_walk,_for
         //sou voador, primeiro caso
         if (voador)
         {
-            if (abs(velh) < .35) and (!socavel) troca_estado(estado_retorna_knock);
-            else if (socavel) troca_estado(estado_pos_knock);    
+            
+            
+            if (abs(velh) < .35) and (!socavel)             troca_estado(estado_retorna_knock);
+            else if (socavel)             troca_estado(estado_pos_knock);                
         }
         else // Segundo caso, não sou voador
         {
-            if (chao) and (!socavel) troca_estado(estado_retorna_knock);
-                else if (chao) and (socavel) troca_estado(estado_pos_knock);
+            if (chao) and (!socavel)             troca_estado(estado_retorna_knock);
+                else if (chao) and (socavel)                 troca_estado(estado_pos_knock);
         }
         
     }
@@ -115,6 +119,66 @@ function inicia_knock_wait(_duracao_knock = 1,_retorna_estado = estado_walk,_for
         if (voador) grav = 0;
     }
     
+}
+
+//Funcao pra criar o estado de morte
+function inicia_morte_inimigo()
+{
+    efeitos_morte = function()
+    {
+        var _centro_y = y - (sprite_height / 2);
+        cria_particula(x, _centro_y, TIPO_PARTICULA.EXPLOSAO, 1);
+        cria_particula(x, _centro_y, TIPO_PARTICULA.ALMA, 3);
+        efeito_sonoro_3d(sfx_enemy_death, x, y, 100, 300, 80, 0.1);
+        InputVibrateConstant(0.5, 0.0, 250)
+    }
+    
+   estado_morte = new estado();
+   
+   estado_morte.inicia = function()
+   {
+       // 1. Muda para a sprite de morte se ela existir
+       if (spr_morto != noone) 
+       {
+           sprite_index = spr_morto;
+           image_index = 0;
+       }
+   
+       // 2. Se NÃO deixa corpo, faz o efeito de explosão na hora
+       if (!tem_morte)
+       {
+            efeitos_morte();
+       }
+       
+
+   }
+   
+   estado_morte.roda = function()
+   {
+
+
+       if (tem_morte)
+       {
+           // Se a animação de morte acabou...
+           if (finalizou_animacao()) and (chao)
+           {
+               // Cria o corpo persistente no chão
+               var _corpo = instance_create_layer(x, y, "Instances", obj_corpo);
+               _corpo.sprite_index = sprite_index;
+               _corpo.image_index = image_number - 1; // Fica no último frame
+               _corpo.image_xscale = image_xscale;
+               
+               efeitos_morte();
+               instance_destroy();
+           }
+       }
+       else
+       {
+           // Se não tem morte física, ele some num fade-out rápido ou após o impacto
+           image_alpha -= 0.1;
+           if (image_alpha <= 0) instance_destroy();
+       }
+   }
 }
 
 //Iniciando boss
@@ -332,13 +396,16 @@ function step_inimigo(_muda_x = 100)
 {
     if (global.pause) exit;
     event_inherited();
+    if (vida_atual <= 0) and (estado_atual != estado_morte) troca_estado(estado_morte);
     checando_chao_geral();
     ajusta_xscale();
     movimento_vertical();
     roda_estado();
-    causa_dano_contato();
+    if (estado_atual != estado_morte) causa_dano_contato();
     muda_x(_muda_x);
     rastreia_tiro_volta();
+    verifica_perigos();
+    animacao();
 }
 
 function get_inimigo_key()

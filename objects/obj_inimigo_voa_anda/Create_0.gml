@@ -129,6 +129,8 @@ estado_fly.finaliza = function()
     timer_troca = 0;
 }
 
+inicia_morte_inimigo();
+
 inicia_knock_wait(1,estado_walk,,,true);
 
 //Iniciando state machine

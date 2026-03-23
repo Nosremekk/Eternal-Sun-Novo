@@ -455,13 +455,23 @@ verifica_espinho = function()
 verifica_agua = function()
 {
     if (estado_atual == estado_dead or estado_atual == estado_hurt or estado_atual == estado_espinho) return;
-
+    
     var _agua = instance_place(x, y, obj_agua);
 
-    
     if (_agua != noone) and (estado_atual != estado_swim)
     {
-        troca_estado(estado_swim);
+        
+        if (y > _agua.bbox_top) 
+        {
+            troca_estado(estado_swim);
+            
+          
+            if (velv > 5) {
+                aplica_screenshake(2);
+                cria_particula(x, _agua.bbox_top, TIPO_PARTICULA.POEIRA_PULO, 10);
+                efeito_sonoro(sfx_wallhit, 40, 0.2, 0.7); // Som abafado
+            }
+        }
     }
 }
 
@@ -1884,7 +1894,6 @@ estado_swim.roda = function()
 {
     var _agua = instance_place(x, y, obj_agua);
 
- 
     if (_agua == noone)
     {
         if (!chao) troca_estado(estado_jump);
@@ -1895,39 +1904,55 @@ estado_swim.roda = function()
     checando_chao();
     checando_paredes();
 
-    var _profundidade_alvo = _agua.bbox_top + 12; 
+    // --- A MÁGICA DO MERGULHO ---
+    var _superficie = _agua.bbox_top + 14; 
+    var _profundidade = bbox_bottom - _superficie;
 
-    if (bbox_bottom > _profundidade_alvo)
+    if (velv > 0) 
     {
-
-        velv = lerp(velv, -3, 0.15); // Sobe 
+        // Se está caindo/mergulhando, a água aplica um "arrasto" (drag)
+        // Isso faz ele afundar bastante, mas ir parando suavemente
+        velv = lerp(velv, 0, 0.1); 
     }
-    else
+
+    // --- EMPUXO (BUOYANCY) ---
+    // Só começa a empurrar pra cima se parou de mergulhar ou se está muito fundo
+    if (velv <= 0.5) 
     {
-        velv = lerp(velv, 1, 0.1);
+        if (_profundidade > 2) // Está abaixo da superfície
+        {
+            // Sobe proporcional à profundidade (mais fundo = sobe mais rápido)
+            var _forca_subida = clamp(_profundidade * 0.1, 0.1, 2);
+            velv = lerp(velv, -_forca_subida, 0.1);
+        }
+        else if (_profundidade < -2) // Está muito "fora" da água
+        {
+            velv = lerp(velv, 1, 0.05); // Cai de volta pro nível da água
+        }
+        else 
+        {
+            // ZONA MORTA: Aqui o player está estável. 
+            // Zeramos a velocidade vertical para matar o "flick"
+            velv = 0; 
+        }
     }
 
-
+    // --- MOVIMENTO E PULO ---
     var _input_ativo = (right - left);
-    var _vel_agua = max_velh * 0.5; // 50% da velocidade normal 
-    velh = lerp(velh, _input_ativo * _vel_agua, acel_chao);
-
+    var _vel_alvo = _input_ativo * (max_velh * 0.6);
+    velh = lerp(velh, _vel_alvo, 0.1);
 
     if (jump)
     {
-        velv = -max_velv * 0.9; 
+        velv = -max_velv * 0.85;
         timer_pulo = 0;
         timer_queda = 0;
-        
-    
-        // efeito_sonoro(sfx_splash, 50, 0.1);
-        cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 5); 
-        
+        cria_particula(x, _agua.bbox_top, TIPO_PARTICULA.POEIRA_PULO, 5); 
         troca_estado(estado_jump);
         exit;
     }
 
-   
+    aplica_dash();
 }
 
 estado_swim.finaliza = function() { }

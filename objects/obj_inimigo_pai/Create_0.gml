@@ -35,7 +35,27 @@ else
     }
 }
 
+//Perigos
+aquatico = false;
+tilemap_morte = layer_tilemap_get_id("Morte"); 
 
+verifica_perigos = function()
+{
+    var _agua = instance_place(x, y, obj_agua);
+    if (_agua != noone and !aquatico)
+    {
+        recebe_dano(vida_max);
+        exit;
+    }
+
+    var _espinho_obj = instance_place(x, y, obj_morte);
+    var _espinho_tile = tilemap_get_at_pixel(tilemap_morte, x, y);
+
+    if (_espinho_obj != noone or _espinho_tile > 0)
+    {
+        recebe_dano(vida_max);
+    }
+}
 
 
 //Variaveis
@@ -105,6 +125,8 @@ aplica_knock = function()
 //Método para receber dano
 function recebe_dano(_dano = 1)
 {
+    if(estado_atual == estado_morte) exit;
+        
     var _combo = combado and obj_player.estado_atual == obj_player.estado_attack;
     //Estou marcando
     var _critico = false;
@@ -201,14 +223,7 @@ function recebe_dano(_dano = 1)
             global.inimigo_marcado = noone;
         }
         
-        instance_destroy();
-
-        cria_particula(x, _centro_y, TIPO_PARTICULA.EXPLOSAO, 1);
-        cria_particula(x, _centro_y, TIPO_PARTICULA.SANGUE, _qtd_sangue * 1.5); 
-        cria_particula(x, _centro_y, TIPO_PARTICULA.ALMA, 3);
-        efeito_sonoro_3d(sfx_enemy_death, x, y, 100, 300, 80, 0.1);
         
-        InputVibrateConstant(0.5, 0.0, 250)
         
     }
         

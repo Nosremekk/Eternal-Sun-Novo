@@ -33,7 +33,7 @@ estado_walk.finaliza = function()
 }
 
 
-
+inicia_morte_inimigo();
 //Iniciando state machine
 inicia_estado(estado_walk);
 

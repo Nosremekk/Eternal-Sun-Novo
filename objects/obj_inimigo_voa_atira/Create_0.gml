@@ -67,7 +67,7 @@ estado_hover.finaliza = function()
     duracao = random_range(2.5,4.25);
 }
 
-
+inicia_morte_inimigo();
 //Aplicando knock
 inicia_knock(estado_walk,,0,true);
 
