@@ -1,6 +1,7 @@
 {
   "FolderOrderSettings":[],
   "ResourceOrderSettings":[
+    {"name":"obj_agua","order":6,"path":"objects/obj_agua/obj_agua.yy",},
     {"name":"obj_aviso_importante","order":1,"path":"objects/obj_aviso_importante/obj_aviso_importante.yy",},
     {"name":"obj_aviso_spawn","order":2,"path":"objects/obj_aviso_spawn/obj_aviso_spawn.yy",},
     {"name":"obj_bumerangue","order":2,"path":"objects/obj_bumerangue/obj_bumerangue.yy",},
@@ -18,6 +19,7 @@
     {"name":"rm_level_demo_8","order":2,"path":"rooms/rm_level_demo_8/rm_level_demo_8.yy",},
     {"name":"rm_level_demo_9","order":3,"path":"rooms/rm_level_demo_9/rm_level_demo_9.yy",},
     {"name":"scr_bestiario","order":1,"path":"scripts/scr_bestiario/scr_bestiario.yy",},
+    {"name":"spr_agua","order":7,"path":"sprites/spr_agua/spr_agua.yy",},
     {"name":"spr_bumerangue","order":2,"path":"sprites/spr_bumerangue/spr_bumerangue.yy",},
     {"name":"spr_cura","order":6,"path":"sprites/spr_cura/spr_cura.yy",},
     {"name":"spr_dinheiro","order":4,"path":"sprites/spr_dinheiro/spr_dinheiro.yy",},

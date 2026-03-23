@@ -14,6 +14,9 @@ if (_xscale_anterior != xscale) and (abs(velh) > 0.5) and (chao)
 
 escala_x = lerp(escala_x, 1, 0.25);
 escala_y = lerp(escala_y, 1, 0.25);
+
+verifica_agua();
+
 roda_estado(); //Se começar a bugar lembrar de passar isso pra dps da colisao
 
 // Colisão

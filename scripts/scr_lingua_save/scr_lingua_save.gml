@@ -289,7 +289,10 @@ function carregar_config()
     global.screenshake_mult = 1;
     global.timer_speedrun = false;
     
-    var _idioma_para_carregar = "pt"; 
+    //Ingles como padrao e no resto do mundo portuguelas     
+    var _idioma_para_carregar = "en";
+    
+    if (os_get_language() == "pt") _idioma_para_carregar = "pt";
     
     if (file_exists("config.json"))
     {
@@ -298,7 +301,7 @@ function carregar_config()
             var _file = file_text_open_read("config.json");
             var _string = "";
 
-            // --- CORREÇÃO: Lê o arquivo inteiro linha por linha ---
+            
             while (!file_text_eof(_file))
             {
                 _string += file_text_readln(_file);

@@ -129,6 +129,7 @@ estado_wakeup = new estado();
 estado_land = new estado();
 estado_magic = new estado();
 estado_rest = new estado();
+estado_swim = new estado();
 
 //Camera
 instancia_camera = function()
@@ -450,6 +451,20 @@ verifica_espinho = function()
     
     if (_tocou_tile > 0) troca_estado(estado_espinho);
 }
+
+verifica_agua = function()
+{
+    if (estado_atual == estado_dead or estado_atual == estado_hurt or estado_atual == estado_espinho) return;
+
+    var _agua = instance_place(x, y, obj_agua);
+
+    
+    if (_agua != noone) and (estado_atual != estado_swim)
+    {
+        troca_estado(estado_swim);
+    }
+}
+
 
 //Deliza hit
 ajusta_xscale_player = function()
@@ -1851,6 +1866,71 @@ estado_rest.finaliza = function()
     salvando_jogo(global.save, true);
     cria_particula(x, y, TIPO_PARTICULA.ALMA, 3);
 }
+
+estado_swim.inicia = function()
+{
+    sprite = spr_player_jump;
+    image_index = 0;
+    
+
+    cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 8); 
+    InputVibrateConstant(0.2, 0.0, 150);
+
+    // Restaura o pulo duplo e o dash para o jogador não ficar preso na água
+    restart_powerups();
+}
+
+estado_swim.roda = function()
+{
+    var _agua = instance_place(x, y, obj_agua);
+
+ 
+    if (_agua == noone)
+    {
+        if (!chao) troca_estado(estado_jump);
+        else troca_estado((abs(velh) > 0.1) ? estado_walk : estado_idle);
+        exit;
+    }
+
+    checando_chao();
+    checando_paredes();
+
+    var _profundidade_alvo = _agua.bbox_top + 12; 
+
+    if (bbox_bottom > _profundidade_alvo)
+    {
+
+        velv = lerp(velv, -3, 0.15); // Sobe 
+    }
+    else
+    {
+        velv = lerp(velv, 1, 0.1);
+    }
+
+
+    var _input_ativo = (right - left);
+    var _vel_agua = max_velh * 0.5; // 50% da velocidade normal 
+    velh = lerp(velh, _input_ativo * _vel_agua, acel_chao);
+
+
+    if (jump)
+    {
+        velv = -max_velv * 0.9; 
+        timer_pulo = 0;
+        timer_queda = 0;
+        
+    
+        // efeito_sonoro(sfx_splash, 50, 0.1);
+        cria_particula(x, bbox_bottom, TIPO_PARTICULA.POEIRA_PULO, 5); 
+        
+        troca_estado(estado_jump);
+        exit;
+    }
+
+   
+}
+
+estado_swim.finaliza = function() { }
 
 inicia_estado(estado_idle);
 instancia_camera();
