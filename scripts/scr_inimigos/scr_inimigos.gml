@@ -53,7 +53,7 @@ function inicia_knock(_retorna_estado = estado_walk,_forca_x_knock = max_velh*2,
 }
 
 //Função para criar a dobradinha knockout e pos_knock
-function inicia_knock_wait(_duracao_knock = 1,_retorna_estado = estado_walk,_forca_x_knock = max_velh*2,_forca_y_knock = -max_velv,_voador = false)
+function inicia_knock_wait(_spr_knock = sprite_index,_spr_wait = sprite_index,_duracao_knock = 1,_retorna_estado = estado_walk,_forca_x_knock = max_velh*2,_forca_y_knock = -max_velv,_voador = false)
 {
     forca_x_knock = _forca_x_knock;
     forca_y_knock = _forca_y_knock;
@@ -68,10 +68,13 @@ function inicia_knock_wait(_duracao_knock = 1,_retorna_estado = estado_walk,_for
     estado_knock = new estado();
     estado_pos_knock = new estado();
     
-    //Debug
+    //Salvando sprites
+    spr_knock = _spr_knock;
+    spr_wait = _spr_wait;
+    
     estado_knock.inicia = function()
     {
-        image_blend = c_yellow;
+        sprite_index = spr_knock;
     }
     
     estado_knock.roda = function()
@@ -97,7 +100,7 @@ function inicia_knock_wait(_duracao_knock = 1,_retorna_estado = estado_walk,_for
     
     estado_pos_knock.inicia = function()//Iniciando o estado de pos knock
     {
-        image_blend = c_black//Debug
+        sprite_index = spr_wait;
         grav = .3;
     }
     
@@ -175,7 +178,7 @@ function inicia_morte_inimigo()
        else
        {
            // Se não tem morte física, ele some num fade-out rápido ou após o impacto
-           image_alpha -= 0.1;
+           image_alpha -= .1 * global.vel_scale;
            if (image_alpha <= 0) instance_destroy();
        }
    }
@@ -291,7 +294,7 @@ function tiro(_desliza = true)
             if (_desliza) velh = -xscale;
             
             //Atirando
-            var _dist = point_distance(x, y, obj_player.x, obj_player.y);
+            var _dist = max(point_distance(x, y, obj_player.x, obj_player.y), 1);
             var _dy = obj_player.y - y;
             var _tiro = instance_create_layer(x,y - sprite_height/2,"Instances",obj_tiro);
             _tiro.hspeed = xscale * vel_tiro;
@@ -337,7 +340,7 @@ function persegue(_voa = false,_dist_comeco = 180,_dist_para = 75,_alvo = obj_pl
 {
     var _dx = _alvo.x - x;
     var _dy = _alvo.y - y;
-    var _dist = point_distance(x, y, _alvo.x, _alvo.y);
+    var _dist = max(point_distance(x, y, _alvo.x, _alvo.y), 1);
     
     //Olhando pro player
     if (_olha) xscale = sign(_dx);

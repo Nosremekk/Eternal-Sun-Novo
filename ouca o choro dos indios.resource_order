@@ -1,5 +1,11 @@
 {
-  "FolderOrderSettings":[],
+  "FolderOrderSettings":[
+    {"name":"ruinas","order":1,"path":"folders/Objects/inimigos/ruinas.yy",},
+    {"name":"Inimigos","order":8,"path":"folders/Sprites/Inimigos.yy",},
+    {"name":"devoto_dash","order":2,"path":"folders/Sprites/Inimigos/Ruinas/devoto_dash.yy",},
+    {"name":"Ruinas","order":1,"path":"folders/Sprites/Inimigos/Ruinas.yy",},
+    {"name":"morcego ruinas","order":1,"path":"folders/Sprites/Inimigos/Ruinas/morcego ruinas.yy",},
+  ],
   "ResourceOrderSettings":[
     {"name":"obj_agua","order":6,"path":"objects/obj_agua/obj_agua.yy",},
     {"name":"obj_aviso_importante","order":1,"path":"objects/obj_aviso_importante/obj_aviso_importante.yy",},
@@ -13,6 +19,8 @@
     {"name":"obj_fragmento_tempo","order":3,"path":"objects/obj_fragmento_tempo/obj_fragmento_tempo.yy",},
     {"name":"obj_fragmento_vida","order":1,"path":"objects/obj_fragmento_vida/obj_fragmento_vida.yy",},
     {"name":"obj_hit_ground","order":3,"path":"objects/obj_hit_ground/obj_hit_ground.yy",},
+    {"name":"obj_inimigo_devoto_submerso","order":2,"path":"objects/obj_inimigo_devoto_submerso/obj_inimigo_devoto_submerso.yy",},
+    {"name":"obj_inimigo_morcego_ruinas","order":1,"path":"objects/obj_inimigo_morcego_ruinas/obj_inimigo_morcego_ruinas.yy",},
     {"name":"obj_loja","order":1,"path":"objects/obj_loja/obj_loja.yy",},
     {"name":"obj_npc_lojista","order":1,"path":"objects/obj_npc_lojista/obj_npc_lojista.yy",},
     {"name":"obj_spawn_point","order":5,"path":"objects/obj_spawn_point/obj_spawn_point.yy",},
@@ -27,5 +35,10 @@
     {"name":"spr_fragmento_tempo","order":5,"path":"sprites/spr_fragmento_tempo/spr_fragmento_tempo.yy",},
     {"name":"spr_fragmento_vida","order":1,"path":"sprites/spr_fragmento_vida/spr_fragmento_vida.yy",},
     {"name":"spr_hit_groundpound","order":3,"path":"sprites/spr_hit_groundpound/spr_hit_groundpound.yy",},
+    {"name":"spr_inimigo_devoto_errante_morto","order":1,"path":"sprites/spr_inimigo_devoto_errante_morto/spr_inimigo_devoto_errante_morto.yy",},
+    {"name":"spr_inimigo_devoto_submerso_dash","order":1,"path":"sprites/spr_inimigo_devoto_submerso_dash/spr_inimigo_devoto_submerso_dash.yy",},
+    {"name":"spr_inimigo_devoto_submerso_hurt","order":3,"path":"sprites/spr_inimigo_devoto_submerso_hurt/spr_inimigo_devoto_submerso_hurt.yy",},
+    {"name":"spr_inimigo_devoto_submerso_morto","order":2,"path":"sprites/spr_inimigo_devoto_submerso_morto/spr_inimigo_devoto_submerso_morto.yy",},
+    {"name":"spr_inimigo_morcego_ruinas_morto","order":1,"path":"sprites/spr_inimigo_morcego_ruinas_morto/spr_inimigo_morcego_ruinas_morto.yy",},
   ],
 }

@@ -66,7 +66,8 @@ function checando_chao_geral()
 //Descontando timer em segundos
 function desconta_timer()
 {
-    return (delta_time / 1000000) * global.vel_scale;
+    var _dt = clamp(delta_time / 1000000, 0, 0.1); 
+    return _dt * global.vel_scale;
 }
 
 //Olhos

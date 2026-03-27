@@ -1952,7 +1952,7 @@ estado_swim.roda = function()
         exit;
     }
 
-    aplica_dash();
+    //aplica_dash();
 }
 
 estado_swim.finaliza = function() { }
